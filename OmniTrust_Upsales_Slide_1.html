@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniTrust — Upsale Opportunities</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Instrument Sans',sans-serif;background:#f0f2f6;color:#1a2433;min-height:100vh;padding:32px}
+
+.slide{
+  background:#ffffff;
+  border-radius:16px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.08);
+  max-width:1320px;
+  margin:0 auto;
+  padding:48px 52px 44px;
+  position:relative;
+  overflow:hidden;
+}
+.slide::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:5px;
+  background:linear-gradient(90deg,#00a896 0%,#4a6ee0 50%,#c89a10 100%);
+}
+
+/* HEADER */
+.slide-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px}
+.logo-area{display:flex;align-items:center;gap:14px}
+.logo{font-family:'DM Serif Display',serif;font-size:22px;color:#00a896;letter-spacing:-0.3px}
+.logo span{color:#1a2433}
+.divider-v{width:1px;height:36px;background:#dde2eb}
+.slide-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#5a6e84}
+.slide-title{font-family:'DM Serif Display',serif;font-size:30px;color:#1a2433;line-height:1.15;margin-top:2px}
+.slide-title em{color:#00a896;font-style:normal}
+.meta-tag{background:#f0f2f6;border:1px solid #dde2eb;border-radius:6px;padding:5px 12px;
+  font-family:'DM Mono',monospace;font-size:11px;color:#5a6e84;letter-spacing:0.4px}
+
+/* SUMMARY STRIP */
+.summary-strip{
+  background:linear-gradient(135deg,#1a2433 0%,#243044 100%);
+  border-radius:10px;padding:18px 28px;margin-bottom:32px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+}
+.sum-item{text-align:center}
+.sum-label{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:rgba(255,255,255,0.5);margin-bottom:4px}
+.sum-val{font-family:'DM Serif Display',serif;font-size:26px;color:#ffffff;line-height:1}
+.sum-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:3px}
+.sum-divider{width:1px;height:44px;background:rgba(255,255,255,0.1)}
+.sum-arrow{font-size:28px;color:rgba(255,255,255,0.2)}
+.sum-total{text-align:center}
+.sum-total .sum-label{color:rgba(255,255,255,0.6)}
+.sum-total .sum-val{font-size:36px;color:#c89a10}
+
+/* OPPORTUNITY CARDS */
+.cards-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:28px}
+.opp-card{
+  border:1px solid #dde2eb;border-radius:12px;padding:24px;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:0;
+}
+.opp-card.c1{border-top:3px solid #00a896}
+.opp-card.c2{border-top:3px solid #4a6ee0}
+.opp-card.c3{border-top:3px solid #c89a10}
+
+.opp-number{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;
+  letter-spacing:1.2px;color:#5a6e84;margin-bottom:10px}
+.opp-icon{font-size:28px;margin-bottom:10px;line-height:1}
+.opp-title{font-family:'DM Serif Display',serif;font-size:19px;color:#1a2433;margin-bottom:6px;line-height:1.2}
+.opp-desc{font-size:12.5px;color:#5a6e84;line-height:1.55;margin-bottom:16px;flex:1}
+
+.opp-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.opp-metric{background:#f5f7fa;border-radius:7px;padding:10px 12px}
+.opp-metric-label{font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;
+  letter-spacing:0.8px;color:#5a6e84;margin-bottom:3px}
+.opp-metric-val{font-family:'DM Serif Display',serif;font-size:22px;line-height:1}
+.opp-metric-val.c1{color:#00a896}
+.opp-metric-val.c2{color:#4a6ee0}
+.opp-metric-val.c3{color:#c89a10}
+.opp-metric-sub{font-size:10px;color:#5a6e84;margin-top:2px}
+
+.chart-wrap{height:130px;position:relative}
+
+.method-tag{
+  background:#f5f7fa;border-radius:6px;padding:6px 10px;
+  font-size:10.5px;color:#5a6e84;line-height:1.4;margin-top:14px;
+  border-left:2px solid #dde2eb;
+}
+.method-tag strong{color:#1a2433}
+
+/* COUNTRY PILLS */
+.country-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.cpill{
+  border-radius:20px;padding:3px 10px;
+  font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.3px;
+}
+.cpill.idn{background:#e8f0fe;color:#4a6ee0;border:1px solid #b8c8f8}
+.cpill.ke{background:#e6f7f5;color:#00a896;border:1px solid #9de0d8}
+.cpill.pipeline{background:#fef9ec;color:#c89a10;border:1px solid #f0d68a;font-style:italic}
+
+/* SERVICES LIST */
+.vas-list{list-style:none;margin-bottom:14px}
+.vas-list li{display:flex;align-items:center;gap:8px;font-size:12px;color:#1a2433;padding:4px 0;border-bottom:1px solid #f0f2f6}
+.vas-list li:last-child{border-bottom:none}
+.vas-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* FOOTER */
+.slide-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:18px;border-top:1px solid #dde2eb;
+  font-family:'DM Mono',monospace;font-size:10px;color:#8a9ab0;
+}
+.footer-note{display:flex;align-items:center;gap:8px}
+.footer-dot{width:5px;height:5px;border-radius:50%;background:#dde2eb;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="slide">
+
+  <!-- HEADER -->
+  <div class="slide-header">
+    <div class="logo-area">
+      <div class="logo">Omni<span>Trust</span></div>
+      <div class="divider-v"></div>
+      <div>
+        <div class="slide-label">Upside Opportunity Analysis</div>
+        <div class="slide-title">Revenue Not Included in <em>Base Model</em></div>
+      </div>
+    </div>
+    <div class="meta-tag">Scenario 3 · Baseline · From Jan 1 2027</div>
+  </div>
+
+  <!-- SUMMARY STRIP -->
+  <div class="summary-strip">
+    <div class="sum-item">
+      <div class="sum-label">Base Model (5yr cumulative)</div>
+      <div class="sum-val">$1.02B</div>
+      <div class="sum-sub">17 countries · 2027–2031</div>
+    </div>
+    <div class="sum-divider"></div>
+    <div class="sum-item">
+      <div class="sum-label">Pipeline Countries</div>
+      <div class="sum-val">$793M</div>
+      <div class="sum-sub">Indonesia + Kenya · 5yr</div>
+    </div>
+    <div class="sum-arrow">+</div>
+    <div class="sum-item">
+      <div class="sum-label">Convenience Fees</div>
+      <div class="sum-val">$81M</div>
+      <div class="sum-sub">8% of transactional vol.</div>
+    </div>
+    <div class="sum-arrow">+</div>
+    <div class="sum-item">
+      <div class="sum-label">Value-Add Services</div>
+      <div class="sum-val">$123M</div>
+      <div class="sum-sub">12% of platform revenue</div>
+    </div>
+    <div class="sum-divider"></div>
+    <div class="sum-total">
+      <div class="sum-label">Total Upsale Potential (5yr)</div>
+      <div class="sum-val">~$997M</div>
+      <div class="sum-sub" style="color:rgba(255,255,255,0.55)">Combined with base: <strong style="color:#c89a10">~$2.0B</strong></div>
+    </div>
+  </div>
+
+  <!-- OPPORTUNITY CARDS -->
+  <div class="cards-row">
+
+    <!-- CARD 1: Pipeline Countries -->
+    <div class="opp-card c1">
+      <div class="opp-number">Upsale 01</div>
+      <div class="opp-icon">🌍</div>
+      <div class="opp-title">Pipeline Countries</div>
+      <div class="country-pills">
+        <span class="cpill idn">Indonesia · 283M pop</span>
+        <span class="cpill ke">Kenya · 56M pop</span>
+        <span class="cpill pipeline">+ further pipeline TBC</span>
+      </div>
+      <div class="opp-desc">
+        Indonesia and Kenya were excluded from the Scenario 3 baseline. Both have active DPI engagements and are modelled under the same SPV structure (25% TECH5 share). Indonesia alone represents the single largest opportunity in the 19-country portfolio.
+      </div>
+      <div class="opp-metrics">
+        <div class="opp-metric">
+          <div class="opp-metric-label">Indonesia 5yr</div>
+          <div class="opp-metric-val c1">$646M</div>
+          <div class="opp-metric-sub">Rev Summary · TECH5</div>
+        </div>
+        <div class="opp-metric">
+          <div class="opp-metric-label">Kenya 5yr</div>
+          <div class="opp-metric-val c1">$147M</div>
+          <div class="opp-metric-sub">Rev Summary · TECH5</div>
+        </div>
+        <div class="opp-metric">
+          <div class="opp-metric-label">Combined 2031</div>
+          <div class="opp-metric-val c1">$287M</div>
+          <div class="opp-metric-sub">Annual run-rate</div>
+        </div>
+        <div class="opp-metric">
+          <div class="opp-metric-label">Combined 5yr</div>
+          <div class="opp-metric-val c1">$793M</div>
+          <div class="opp-metric-sub">Cumulative TECH5</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-pipe"></canvas></div>
+      <div class="method-tag"><strong>Source:</strong> Revenue Summary sheet · Rows 8 (Kenya) & 22 (Indonesia) · TECH5 @ 25% SPV · Live dates per InputT</div>
+    </div>
+
+    <!-- CARD 2: Convenience Fees -->
+    <div class="opp-card c2">
+      <div class="opp-number">Upsale 02</div>
+      <div class="opp-icon">💳</div>
+      <div class="opp-title">Convenience Fees</div>
+      <div class="opp-desc">
+        A per-transaction convenience fee applied when citizens or institutions access identity services through premium channels — mobile wallets, card rails, third-party integrations. Common in comparable DPI deployments at 3–12% of transactional volume. Not currently modelled.
+      </div>
+      <div class="opp-metrics">
+        <div class="opp-metric">
+          <div class="opp-metric-label">2031 Annual</div>
+          <div class="opp-metric-val c2">$32.5M</div>
+          <div class="opp-metric-sub">8% × L3 + Payments</div>
+        </div>
+        <div class="opp-metric">
+          <div class="opp-metric-label">5yr Cumulative</div>
+          <div class="opp-metric-val c2">$80.5M</div>
+          <div class="opp-metric-sub">Growing with volume</div>
+        </div>
+        <div class="opp-metric">
+          <div class="opp-metric-label">Rate Applied</div>
+          <div class="opp-metric-val c2">8%</div>
+          <div class="opp-metric-sub">Conservative mid-range</div>
+        </div>
+        <div class="opp-metric">
+          <div class="opp-metric-label">Base Volume 2031</div>
+          <div class="opp-metric-val c2">$406M</div>
+          <div class="opp-metric-sub">L3 + Payments rev.</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-conv"></canvas></div>
+      <div class="method-tag"><strong>Methodology:</strong> 8% uplift on L3 Transactional + Payments revenue (AFS). Benchmark: GSMA Digital Finance · Parchment/Digitary fee schedules · CGAP Digital Finance Benchmarks</div>
+    </div>
+
+    <!-- CARD 3: Value-Added Services -->
+    <div class="opp-card c3">
+      <div class="opp-number">Upsale 03</div>
+      <div class="opp-icon">⚡</div>
+      <div class="opp-title">Value-Add Services</div>
+      <div class="opp-desc">
+        Premium platform capabilities layered on top of core identity — expanding ARPU per institution without new country rollout. These services naturally emerge as the installed base matures and institutional clients seek deeper integration.
+      </div>
+      <ul class="vas-list">
+        <li><div class="vas-dot" style="background:#c89a10"></div><strong>Secure Messaging</strong> — encrypted govt-to-citizen comms, $0.02–0.05/msg</li>
+        <li><div class="vas-dot" style="background:#4a6ee0"></div><strong>Analytics &amp; Dashboards</strong> — institutional BI subscription, ~20% L2 premium</li>
+        <li><div class="vas-dot" style="background:#e63946"></div><strong>Generative AI Services</strong> — fraud detection, predictive compliance, AI verification</li>
+      </ul>
+      <div class="opp-metrics">
+        <div class="opp-metric">
+          <div class="opp-metric-label">2031 Annual</div>
+          <div class="opp-metric-val c3">$49.6M</div>
+          <div class="opp-metric-sub">12% of platform rev.</div>
+        </div>
+        <div class="opp-metric">
+          <div class="opp-metric-label">5yr Cumulative</div>
+          <div class="opp-metric-val c3">$122.6M</div>
+          <div class="opp-metric-sub">Scaling with base</div>
+        </div>
+        <div class="opp-metric">
+          <div class="opp-metric-label">Rate Applied</div>
+          <div class="opp-metric-val c3">12%</div>
+          <div class="opp-metric-sub">Conservative attach rate</div>
+        </div>
+        <div class="opp-metric">
+          <div class="opp-metric-label">Base Platform 2031</div>
+          <div class="opp-metric-val c3">$413M</div>
+          <div class="opp-metric-sub">Total TECH5 revenue</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-vas"></canvas></div>
+      <div class="method-tag"><strong>Methodology:</strong> 12% revenue attach on total platform (AFS). Benchmark: Plaid/Smile API Africa · World Bank GovTech Maturity Index VAS tiers · Juniper Research DPI Premium Services 2024</div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="slide-footer">
+    <div class="footer-note">
+      <div class="footer-dot"></div>
+      All upsale figures are illustrative estimates extrapolated from the Scenario 3 Baseline model and publicly available benchmarks. Not included in the base financial projections.
+    </div>
+    <div>OmniTrust · TECH5-SA · Scenario 3 · From Jan 1 2027</div>
+  </div>
+
+</div>
+
+<script>
+Chart.register(ChartDataLabels);
+Chart.defaults.set('plugins.datalabels',{display:false});
+
+const years = ['2027','2028','2029','2030','2031'];
+
+const cBase = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{
+    legend:{display:false},
+    tooltip:{backgroundColor:'#ffffff',borderColor:'#dde2eb',borderWidth:1,titleColor:'#1a2433',bodyColor:'#5a6e84'},
+    datalabels:{display:false}
+  },
+  scales:{
+    x:{ticks:{color:'#8a9ab0',font:{family:'DM Mono',size:9}},grid:{display:false}},
+    y:{ticks:{color:'#8a9ab0',font:{family:'DM Mono',size:9},callback:v=>v>=1e6?'$'+(v/1e6).toFixed(0)+'M':''},
+       grid:{color:'rgba(0,0,0,0.04)'}}
+  }
+};
+
+// Pipeline chart — stacked Indonesia + Kenya
+const ke  = [5735041,11515981,28629303,57075006,43806629];
+const idn = [31930812,64007136,127868760,179219982,243372630];
+new Chart(document.getElementById('chart-pipe'),{
+  type:'bar',
+  data:{labels:years,datasets:[
+    {label:'Indonesia',data:idn,backgroundColor:'rgba(74,110,224,0.8)',borderRadius:3,stack:'s',
+     datalabels:{display:true,anchor:'end',align:'top',color:'#5a6e84',font:{family:'DM Mono',size:8},
+       formatter:(_,c)=>{const t=idn[c.dataIndex]+ke[c.dataIndex];return '$'+(t/1e6).toFixed(0)+'M';}}},
+    {label:'Kenya',data:ke,backgroundColor:'rgba(0,168,150,0.75)',borderRadius:3,stack:'s',
+     datalabels:{display:false}}
+  ]},
+  options:{...cBase,scales:{...cBase.scales,x:{...cBase.scales.x},y:{...cBase.scales.y,stacked:true}}},
+  plugins:[ChartDataLabels]
+});
+
+// Convenience fees chart
+const cf = [939690,4886578,17044484,25163661,32519750];
+new Chart(document.getElementById('chart-conv'),{
+  type:'bar',
+  data:{labels:years,datasets:[{
+    label:'Convenience Fees',data:cf,
+    backgroundColor:years.map((_,i)=>`rgba(74,110,224,${0.4+i*0.12})`),
+    borderRadius:4,
+    datalabels:{display:true,anchor:'end',align:'top',color:'#5a6e84',font:{family:'DM Mono',size:8},
+      formatter:v=>v>=1e6?'$'+(v/1e6).toFixed(1)+'M':'$'+(v/1e3).toFixed(0)+'K'}
+  }]},
+  options:{...cBase,plugins:{...cBase.plugins,datalabels:{display:'auto'}}},
+  plugins:[ChartDataLabels]
+});
+
+// VAS chart
+const vas = [1417114,7429761,25903378,38285444,49552367];
+new Chart(document.getElementById('chart-vas'),{
+  type:'line',
+  data:{labels:years,datasets:[{
+    label:'Value-Add Services',data:vas,
+    borderColor:'#c89a10',backgroundColor:'rgba(200,154,16,0.1)',
+    fill:true,tension:0.4,pointRadius:4,pointBackgroundColor:'#c89a10',
+    datalabels:{display:true,anchor:'end',align:'top',offset:3,color:'#c89a10',
+      font:{family:'DM Mono',size:8},formatter:v=>'$'+(v/1e6).toFixed(1)+'M'}
+  }]},
+  options:{...cBase,plugins:{...cBase.plugins,datalabels:{display:'auto'}}},
+  plugins:[ChartDataLabels]
+});
+</script>
+</body>
+</html>
