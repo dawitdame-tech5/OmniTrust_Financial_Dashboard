@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniTrust — 17 Country Financial Dashboard · Scenario 3 · From Jan 1 2027</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap');
+  :root {
+    --bg:#f0f2f6;--surface:#ffffff;--surface2:#f5f7fa;--border:#dde2eb;
+    --accent:#00a896;--accent2:#c89a10;--accent3:#d94f4f;--accent4:#4a6ee0;
+    --text:#1a2433;--muted:#5a6e84;--green:#17a062;--red:#d94f4f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  header{padding:28px 40px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#ffffff 0%,#f5f7fa 100%)}
+  .logo{font-family:'DM Serif Display',serif;font-size:26px;letter-spacing:-0.5px;color:var(--accent)}
+  .logo span{color:var(--text)}
+  .header-meta{display:flex;gap:24px;align-items:center}
+  .badge{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase}
+  .badge.active{color:var(--accent);border-color:var(--accent);background:rgba(0,229,195,0.08)}
+  .tabs{display:flex;gap:0;padding:0 40px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto}
+  .tab{padding:14px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.15s;letter-spacing:0.2px}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+  main{padding:32px 40px;max-width:1600px}
+  .panel{display:none}.panel.active{display:block}
+  .kpi-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+  .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent)}
+  .kpi.red::before{background:linear-gradient(90deg,var(--red),transparent)}
+  .kpi.yellow::before{background:linear-gradient(90deg,var(--accent2),transparent)}
+  .kpi.blue::before{background:linear-gradient(90deg,var(--accent4),transparent)}
+  .kpi-label{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px}
+  .kpi-value{font-family:'DM Serif Display',serif;font-size:28px;color:var(--text);line-height:1;margin-bottom:4px}
+  .kpi-sub{font-size:11px;color:var(--muted)}
+  .kpi-sub.up{color:var(--green)}.kpi-sub.down{color:var(--red)}
+  .section-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);margin-bottom:16px;margin-top:8px;display:flex;align-items:center;gap:10px}
+  .section-title .line{flex:1;height:1px;background:var(--border)}
+  .chart-grid{display:grid;gap:20px;margin-bottom:28px}
+  .chart-grid.cols2{grid-template-columns:1fr 1fr}
+  .chart-grid.cols3{grid-template-columns:1fr 1fr 1fr}
+  .chart-grid.cols21{grid-template-columns:2fr 1fr}
+  .chart-grid.cols12{grid-template-columns:1fr 2fr}
+  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;position:relative;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+  .chart-card-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;font-family:'DM Mono',monospace}
+  .chart-card-sub{font-size:11px;color:var(--muted);margin-bottom:16px;opacity:0.7}
+  canvas{max-height:360px}
+  .data-table{width:100%;border-collapse:collapse;font-size:13px}
+  .data-table th{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);padding:8px 12px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
+  .data-table th:first-child{text-align:left}
+  .data-table td{padding:8px 12px;text-align:right;border-bottom:1px solid rgba(0,0,0,0.04);font-family:'DM Mono',monospace;font-size:12px;white-space:nowrap}
+  .data-table td:first-child{text-align:left;font-family:'Instrument Sans',sans-serif;font-size:13px}
+  .data-table tr:hover td{background:rgba(0,0,0,0.025)}
+  .data-table .total-row td{color:var(--accent);font-weight:500;border-top:1px solid var(--border)}
+  .data-table .neg{color:var(--red)}.data-table .pos{color:var(--green)}
+  .table-wrapper{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+  .table-inner{min-width:900px;padding:0}
+  .ramp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:28px}
+  .country-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;transition:border-color 0.15s;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+  .country-card:hover{border-color:var(--accent)}
+  .country-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+  .country-type{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px}
+  .country-turn-on{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);margin-bottom:6px}
+  .country-pop{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+  .ramp-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden}
+  .ramp-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent4));border-radius:2px}
+  .legend-strip{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .legend-dot{width:8px;height:8px;border-radius:50%}
+  .pop-callout{background:linear-gradient(135deg,rgba(74,110,224,0.07),rgba(0,168,150,0.04));border:1px solid rgba(74,110,224,0.18);border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;gap:40px;flex-wrap:wrap}
+  .pop-stat-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+  .pop-stat-val{font-family:'DM Serif Display',serif;font-size:24px;color:var(--accent4)}
+  /* DCF STYLES */
+  .dcf-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px}
+  .valuation-box{background:linear-gradient(135deg,rgba(0,168,150,0.07),rgba(74,110,224,0.04));border:1px solid rgba(0,168,150,0.3);border-radius:10px;padding:24px;text-align:center}
+  .valuation-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px}
+  .valuation-val{font-family:'DM Serif Display',serif;font-size:42px;color:var(--accent);line-height:1}
+  .valuation-sub{font-size:12px;color:var(--muted);margin-top:6px}
+  .sensitivity-table{width:100%;border-collapse:collapse;font-size:11px}
+  .sensitivity-table th{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);padding:6px 10px;text-align:center;border-bottom:1px solid var(--border);white-space:nowrap}
+  .sensitivity-table td{font-family:'DM Mono',monospace;font-size:11px;padding:6px 10px;text-align:center;border-bottom:1px solid rgba(0,0,0,0.04)}
+  .sensitivity-table .highlight{color:var(--accent);font-weight:500}
+  .wacc-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .wacc-chip{background:#ffffff;border:1px solid #dde2eb;box-shadow:0 1px 3px rgba(0,0,0,0.05);border-radius:6px;padding:8px 14px;text-align:center;flex:1;min-width:100px}
+  .wacc-chip-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+  .wacc-chip-val{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent2)}
+  .pdf-btn{display:flex;align-items:center;gap:8px;padding:8px 18px;background:linear-gradient(135deg,rgba(0,229,195,0.15),rgba(124,158,248,0.1));border:1px solid rgba(0,229,195,0.4);border-radius:7px;color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;font-weight:500;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+  .pdf-btn:hover{background:linear-gradient(135deg,rgba(0,229,195,0.25),rgba(124,158,248,0.15));border-color:var(--accent);box-shadow:0 0 12px rgba(0,229,195,0.2)}
+  .pdf-btn:disabled{opacity:0.5;cursor:not-allowed}
+  .pdf-btn svg{width:14px;height:14px;flex-shrink:0}
+  .pdf-overlay{display:none;position:fixed;inset:0;background:rgba(240,242,246,0.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(4px)}
+  .pdf-overlay.visible{display:flex}
+  .pdf-overlay-title{font-family:'DM Serif Display',serif;font-size:22px;color:#1a2433}
+  .pdf-overlay-sub{font-family:'DM Mono',monospace;font-size:12px;color:#5a6e84;letter-spacing:0.5px}
+  .pdf-progress{width:280px;height:3px;background:#dde2eb;border-radius:2px;overflow:hidden}
+  .pdf-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent4));border-radius:2px;transition:width 0.3s ease}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .pdf-spinner{width:32px;height:32px;border:2px solid #dde2eb;border-top-color:#00a896;border-radius:50%;animation:spin 0.8s linear infinite}
+    header{padding:16px 20px}main{padding:20px}.tabs{padding:0 20px}
+    .chart-grid.cols2,.chart-grid.cols3,.chart-grid.cols21,.chart-grid.cols12,.dcf-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Omni<span>Trust</span></div>
+  <div class="header-meta">
+    <div class="badge">17 Countries</div>
+    <div class="badge active">Scenario 3 · Baseline · From Jan 1 2027</div>
+    <div class="badge">FY2027–2031</div>
+    <button class="pdf-btn" id="pdf-btn" onclick="downloadPDF()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export PDF
+    </button>
+  </div>
+</header>
+
+<div class="pdf-overlay" id="pdf-overlay">
+  <div class="pdf-spinner"></div>
+  <div class="pdf-overlay-title">Generating PDF</div>
+  <div class="pdf-overlay-sub" id="pdf-status">Rendering all panels…</div>
+  <div class="pdf-progress"><div class="pdf-progress-bar" id="pdf-bar"></div></div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('ramp')">Country Ramp-Up</div>
+  <div class="tab" onclick="switchTab('overview')">Revenue &amp; P&amp;L</div>
+  <div class="tab" onclick="switchTab('costs')">Cost Structure</div>
+  <div class="tab" onclick="switchTab('margins')">Margins & Profitability</div>
+  <div class="tab" onclick="switchTab('population')">Population & Rev/Pop</div>
+  <div class="tab" onclick="switchTab('cashflow')">Cash Flow</div>
+  <div class="tab" onclick="switchTab('dcf')">DCF &amp; Valuation</div>
+</div>
+<main>
+
+<!-- REVENUE & P&L OVERVIEW -->
+<div id="panel-overview" class="panel">
+  <div class="kpi-strip" id="kpi-afs"></div>
+  <div class="section-title">Revenue &amp; P&amp;L Overview <span class="line"></span></div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">Revenue Components (Stacked)</div>
+      <div class="chart-card-sub">L2 Platform Access · L3 Transactions · Payments · Annual</div>
+      <canvas id="chart-rev-stack"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Revenue vs Costs · Operating &amp; Net Income</div>
+      <div class="chart-card-sub">USD · Annual · AFS Sheet</div>
+      <canvas id="chart-rev-opex"></canvas>
+    </div>
+  </div>
+  <div class="section-title">Sector Revenue Mix — Cumulative TECH5 Distribution <span class="line"></span></div>
+  <div class="chart-card" style="margin-bottom:20px">
+    <div class="chart-card-title">Revenue by Sector (Treemap · Cumulative TECH5)</div>
+    <div class="chart-card-sub">Source: Revenue Summary · Section V · Hover for % share · "Other" = Education, Transport, Tourism, Utilities, Agriculture, Trade, Digital Economy &amp; more</div>
+    <div id="treemap-sector" style="width:100%;height:340px;position:relative"></div>
+  </div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">Operating &amp; Net Income</div>
+      <div class="chart-card-sub">USD · Annual</div>
+      <canvas id="chart-income"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Operating &amp; Net Margin (%)</div>
+      <div class="chart-card-sub">Year-by-year margin profile</div>
+      <canvas id="chart-margins-line-2"></canvas>
+    </div>
+  </div>
+  <div class="section-title">Full P&amp;L Summary <span class="line"></span></div>
+  <div class="table-wrapper"><div class="table-inner"><table class="data-table" id="tbl-pnl"></table></div></div>
+</div>
+
+<!-- COST STRUCTURE -->
+<div id="panel-costs" class="panel">
+  <div class="kpi-strip" id="kpi-costs"></div>
+  <div class="section-title">Key Cost Drivers <span class="line"></span></div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">Direct · Total (Direct+OpEx) · HR/Payroll</div>
+      <div class="chart-card-sub">Three core cost lines · Values labelled on major bars · USD</div>
+      <canvas id="chart-cost-drivers"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Total Cost as % of Revenue</div>
+      <div class="chart-card-sub">Direct · Indirect OpEx · Total · Endpoint labelled</div>
+      <canvas id="chart-costs-pct"></canvas>
+    </div>
+  </div>
+  <div class="section-title">Full Cost Breakdown <span class="line"></span></div>
+  <div class="chart-card" style="margin-bottom:20px">
+    <div class="chart-card-title">Cost Stack — All Categories (Direct + Indirect OpEx)</div>
+    <div class="chart-card-sub">Stacked · Total labelled on top · USD</div>
+    <canvas id="chart-costs-stack" style="max-height:260px"></canvas>
+  </div>
+  <div class="section-title">Cost Detail Table <span class="line"></span></div>
+  <div class="table-wrapper"><div class="table-inner"><table class="data-table" id="tbl-costs"></table></div></div>
+</div>
+
+<!-- MARGINS -->
+<div id="panel-margins" class="panel">
+  <div class="kpi-strip" id="kpi-margins"></div>
+  <div class="section-title">Margin Progression <span class="line"></span></div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">Operating & Net Margin (%)</div>
+      <canvas id="chart-margins-line"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Gross Margin vs Net Income</div>
+      <canvas id="chart-gm-ni"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- COUNTRY RAMP -->
+<div id="panel-ramp" class="panel active">
+  <div class="section-title">17-Country Revenue Ramp-Up <span class="line"></span></div>
+  <div class="legend-strip">
+    <div class="legend-item"><div class="legend-dot" style="background:#e05f5f"></div> Blue Whale (&gt;100M pop)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f7c843"></div> Workhorse (20–100M)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#00e5c3"></div> Gazelle (5–20M)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7c9ef8"></div> Hummingbird (&lt;5M)</div>
+  </div>
+  <div class="ramp-grid" id="country-cards"></div>
+
+  <div class="section-title">Revenue Waterfall — Wave Build to $1B Cumulative <span class="line"></span></div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">Annual Revenue by Wave + Running Cumulative</div>
+      <div class="chart-card-sub">Bars = annual TECH5 by wave · Line = running cumulative · USD</div>
+      <canvas id="chart-wave-waterfall" style="max-height:300px"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Country Cumulative 2027–2031 (Treemap)</div>
+      <div class="chart-card-sub">Area = 5yr TECH5 total · Colour = revenue start year · Hover for detail</div>
+      <div id="treemap-country" style="width:100%;height:300px;position:relative"></div>
+    </div>
+  </div>
+
+  <div class="section-title">Cumulative Country Contributions — by Revenue Start Year <span class="line"></span></div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">Cumulative Revenue 2027–2031 by Country</div>
+      <div class="chart-card-sub">Coloured by revenue start year (Operations) · Sorted by total</div>
+      <canvas id="chart-country-bar" style="max-height:300px"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Cumulative Revenue Build by Start-Year Cohort</div>
+      <div class="chart-card-sub">Running cumulative per cohort · 2027/2028/2029 revenue starts</div>
+      <canvas id="chart-country-trend" style="max-height:300px"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:20px">
+    <div class="chart-card-title">Top 6 Country — Running Cumulative Revenue Build</div>
+    <div class="chart-card-sub">Year-on-year cumulative total per country</div>
+    <canvas id="chart-country-cumul-trend" style="max-height:220px"></canvas>
+  </div>
+
+  <div class="section-title">Country Revenue &amp; Per Capita Detail <span class="line"></span></div>
+  <div class="table-wrapper"><div class="table-inner"><table class="data-table" id="tbl-countries"></table></div></div>
+</div>
+
+<!-- POPULATION -->
+<div id="panel-population" class="panel">
+  <div class="pop-callout">
+    <div class="pop-stat"><div class="pop-stat-label">Total Population (2024)</div><div class="pop-stat-val">444.5M</div></div>
+    <div class="pop-stat"><div class="pop-stat-label">Projected Population (2031)</div><div class="pop-stat-val">521.7M</div></div>
+    <div class="pop-stat"><div class="pop-stat-label">Avg Annual Growth</div><div class="pop-stat-val">~2.3%</div></div>
+    <div class="pop-stat"><div class="pop-stat-label">Largest Country</div><div class="pop-stat-val">Ethiopia</div></div>
+    <div class="pop-stat"><div class="pop-stat-label">Countries in Basket</div><div class="pop-stat-val">17</div></div>
+  </div>
+  <div class="section-title">Population Growth (2024–2031) <span class="line"></span></div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">Total Population — 17 Countries</div>
+      <div class="chart-card-sub">Millions · 2024–2031</div>
+      <canvas id="chart-pop-total"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Population by Country (2027)</div>
+      <canvas id="chart-pop-country"></canvas>
+    </div>
+  </div>
+  <div class="section-title">Revenue per Population (2027–2031) <span class="line"></span></div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">Revenue per Capita (USD) — Portfolio Total</div>
+      <canvas id="chart-rev-pop"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Revenue per Capita by Country (2031)</div>
+      <canvas id="chart-rev-pop-country"></canvas>
+    </div>
+  </div>
+  <div class="section-title">Population & Rev/Pop Table (2027–2031) <span class="line"></span></div>
+  <div class="table-wrapper"><div class="table-inner"><table class="data-table" id="tbl-population"></table></div></div>
+</div>
+
+<!-- CASH FLOW -->
+<div id="panel-cashflow" class="panel">
+  <div class="kpi-strip" id="kpi-cf"></div>
+  <div class="section-title">Cash Flow Analysis <span class="line"></span></div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">Net Cash from Operations vs CAPEX</div>
+      <canvas id="chart-cf-ops"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Cash Balance EoP</div>
+      <canvas id="chart-cash-bal"></canvas>
+    </div>
+  </div>
+  <div class="section-title">Cumulative Cash Generation <span class="line"></span></div>
+  <div class="chart-card" style="margin-bottom:20px">
+    <div class="chart-card-title">Free Cash Flow Accumulation</div>
+    <canvas id="chart-cum-cf" style="max-height:220px"></canvas>
+  </div>
+</div>
+
+<!-- DCF & VALUATION -->
+<div id="panel-dcf" class="panel">
+  <div class="kpi-strip" id="kpi-invest"></div>
+  <div class="section-title">Sources &amp; Uses of Funds (Outputs Sheet) <span class="line"></span></div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">$30M Investment — Uses Breakdown</div>
+      <div class="chart-card-sub">Capitalised project implementation, IP, R&amp;D, infrastructure &amp; working capital</div>
+      <canvas id="chart-uses-pie" style="max-height:260px"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">EBITDA · NOPLAT · Free Cash Flow</div>
+      <div class="chart-card-sub">Source: KPIs sheet · Scenario 3 Baseline · USD</div>
+      <canvas id="chart-cumul-cf-invest"></canvas>
+    </div>
+  </div>
+  <div class="section-title">DCF Valuation — Scenario 3 · Baseline · From Jan 1 2027 <span class="line"></span></div>
+  <div class="wacc-row" id="wacc-chips"></div>
+  <div class="dcf-grid">
+    <div class="valuation-box">
+      <div class="valuation-label">Entity Value (Debt-Free, Cash-Free)</div>
+      <div class="valuation-val">$333.9M</div>
+      <div class="valuation-sub">Sum of DCF + Terminal Value</div>
+    </div>
+    <div class="valuation-box" style="border-color:rgba(200,154,16,0.3);background:linear-gradient(135deg,rgba(200,154,16,0.07),rgba(0,168,150,0.03))">
+      <div class="valuation-label">Equity Value</div>
+      <div class="valuation-val" style="color:var(--accent2)">$363.0M</div>
+      <div class="valuation-sub">Entity Value + $29.1M Cash − $0 Debt</div>
+    </div>
+  </div>
+  <div class="section-title">Free Cash Flow to Firm (FCFF) <span class="line"></span></div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">FCFF vs Discounted FCFF</div>
+      <div class="chart-card-sub">WACC = 30.23%</div>
+      <canvas id="chart-fcff"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">NOPLAT Bridge to FCFF</div>
+      <div class="chart-card-sub">NOPLAT → FCF components</div>
+      <canvas id="chart-noplat"></canvas>
+    </div>
+  </div>
+  <div class="section-title">Sensitivity Analysis <span class="line"></span></div>
+  <div class="chart-grid cols2">
+    <div class="chart-card">
+      <div class="chart-card-title">Terminal Value Sensitivity (WACC × g)</div>
+      <div class="chart-card-sub">USD Millions · 5×5 matrix · highlighted = base case</div>
+      <div id="sensitivity-tv" style="margin-top:8px"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Sum of Discounted FCF by WACC Scenario</div>
+      <canvas id="chart-wacc-sum"></canvas>
+    </div>
+  </div>
+  <div class="section-title">DCF Detail Table <span class="line"></span></div>
+  <div class="table-wrapper"><div class="table-inner"><table class="data-table" id="tbl-dcf"></table></div></div>
+</div>
+
+</main>
+<script>
+// ============================
+// DATA
+// ============================
+const years = [2027,2028,2029,2030,2031];
+
+const D = {
+  totalRev:   [11809286.52,61914671.31,215861484.79,319045365.10,412936389.80],
+  directCost: [7634172.48,13616758.18,20234630.35,33565421.15,65374766.48],
+  grossMar:   [4175114.04,48297913.12,195626854.44,285479943.95,347561623.32],
+  totalOpex:  [10491847.87,21440379.38,28089714.98,47532227.26,60060925.65],
+  opIncome:   [-6316733.84,26857533.74,167537139.46,237947716.69,287500697.66],
+  opMargin:   [-0.5348,0.4338,0.7761,0.7459,0.6964],
+  netIncome:  [-6316733.84,18087211.10,114163927.50,163209923.87,197727114.61],
+  netMargin:  [-0.5348,0.2921,0.5289,0.5116,0.4788],
+  corpTax:    [0,5127254.65,49730143.97,71094724.83,86130515.06],
+  pbit:       [-6316733.84,23214465.75,163894071.47,234304648.70,283857629.67],
+  deprec:     [0,1137891.33,1137891.33,1137891.33,1137891.33],
+  amort:      [0,2505176.66,2505176.66,2505176.66,2505176.66],
+  payroll:    [7575803.05,16251227.10,17869853.01,20542448.24,23936785.57],
+  marketing:  [743333.33,929166.67,1161458.33,9330658.40,12153364.13],
+  rnd:        [0,0,0,0,839397.82],
+  bizdev:     [538333.33,672916.67,841145.83,6220438.93,8102242.75],
+  training:   [399130.43,514571.31,2031009.63,3110219.47,4051121.38],
+  fixedOH:    [1041747.72,2544268.48,4958318.49,6385713.20,7982141.50],
+  maint:      [193500.00,528229.17,1227929.69,1942749.02,2995872.50],
+  revL2:      [138204.17,855551.04,2800434.38,4519690.00,6456700.00],
+  revL3:      [11263644.85,56884695.27,185433030.41,267102875.10,351680009.80],
+  payments:   [407437.50,4174425.00,27628020.00,47422800.00,54799680.00],
+  capex:      [21795706.65,0,0,0,0],
+  netCashOps: [-6316733.84,21730279.09,117806995.49,166852991.86,201370182.60],
+  cashEop:    [1514331.70,23244610.79,141051606.28,307904598.13,509274780.74]
+};
+
+// 17 countries — Kenya and Indonesia excluded. Source: Operations sheet (L2+L3+Payments, TECH5 level)
+const countryRev = {
+  'Papua New Guinea': [1297075,2770035,5490185,7810098,10450018],
+  'Ethiopia':         [5614658,23373489,57409721,80981210,103586557],
+  'Colombia':         [0,0,33954182,50126129,64130299],
+  'Somalia':          [1394779,2861934,4262367,6103916,8400406],
+  'Honduras':         [1114335,2471968,4879139,6998011,9279777],
+  'Guatemala':        [0,0,9930101,14156170,18012117],
+  'Senegal':          [845142,4163264,6354079,9249144,12443186],
+  'Botswana':         [535727,1717323,3029962,4465522,5342601],
+  'Djibouti':         [207179,596651,1039673,1501135,1818217],
+  'Mauritius':        [0,79738,1693391,2512671,3050901],
+  'Fiji':             [0,0,688595,1334387,1615873],
+  'Comoros':          [0,228054,790951,1132485,1375253],
+  'Zambia':           [800390,5033343,9997384,14162661,19034307],
+  'Tanzania':         [0,10391563,34003566,47936983,61555965],
+  'Uganda':           [0,7609396,20175332,28489410,38481661],
+  'Peru':             [0,0,20019977,39018387,50641928],
+  'Timor-Leste':      [0,617912,2142880,3067045,3717323]
+};
+
+// Population — Kenya & Indonesia removed
+const popBase2024 = {
+  'Papua New Guinea':10576502,'Ethiopia':132059767,'Colombia':52886363,
+  'Somalia':19009151,'Honduras':10825703,'Guatemala':18406359,'Senegal':18501984,
+  'Botswana':2521139,'Djibouti':1168722,'Mauritius':1245779,'Fiji':928784,
+  'Comoros':866628,'Zambia':21314956,'Tanzania':68560157,
+  'Uganda':50015092,'Peru':34217848,'Timor-Leste':1400638
+};
+const growthRates = {
+  'Papua New Guinea':0.027,'Ethiopia':0.025,'Colombia':0.008,'Somalia':0.032,
+  'Honduras':0.015,'Guatemala':0.020,'Senegal':0.027,'Botswana':0.012,
+  'Djibouti':0.015,'Mauritius':0.002,'Fiji':0.006,'Comoros':0.022,
+  'Zambia':0.028,'Tanzania':0.029,'Uganda':0.031,'Peru':0.009,'Timor-Leste':0.021
+};
+const archetypes = {
+  'Ethiopia':'Blue Whale',
+  'Colombia':'Workhorse','Tanzania':'Workhorse','Uganda':'Workhorse','Peru':'Workhorse',
+  'Papua New Guinea':'Gazelle','Somalia':'Gazelle','Honduras':'Gazelle','Guatemala':'Gazelle','Senegal':'Gazelle','Zambia':'Gazelle',
+  'Botswana':'Hummingbird','Djibouti':'Hummingbird','Mauritius':'Hummingbird','Fiji':'Hummingbird','Comoros':'Hummingbird','Timor-Leste':'Hummingbird'
+};
+const archetypeColors = {'Blue Whale':'#e05f5f','Workhorse':'#f7c843','Gazelle':'#00e5c3','Hummingbird':'#7c9ef8'};
+const turnOnDates = {
+  'Papua New Guinea':'2027 Q1','Ethiopia':'2027 Q3','Colombia':'2028 Q4',
+  'Somalia':'2027 Q1','Honduras':'2027 Q1','Guatemala':'2028 Q4','Senegal':'2027 Q3',
+  'Botswana':'2027 Q1','Djibouti':'2027 Q1','Mauritius':'2028 Q4','Fiji':'2029 Q2',
+  'Comoros':'2028 Q3','Zambia':'2027 Q3','Tanzania':'2028 Q1',
+  'Uganda':'2028 Q1','Peru':'2028 Q3','Timor-Leste':'2028 Q3'
+};
+
+// DCF Data — sourced from DCF-WACC sheet
+const DCF = {
+  noplat:    [-4400056.31,18708190.65,116701584.57,165747580.94,200849472.23],
+  da:        [183284.14,583176.80,983069.47,1382962.14,1727904.00],
+  wc:        [-4716746.22,-4556580.17,-23365899.60,-12667323.50,-11490025.33],
+  invest:    [-2179570.66,-2179570.66,-2179570.66,-2179570.66,-2179570.66],
+  fcff:      [-11113089.06,12555216.62,92139183.78,152283648.91,188907780.23],
+  discFcff:  [-8533421.20,7402884.70,41716659.44,52942790.17,50430326.93],
+  discFactor:[0.7679,0.5896,0.4528,0.3477,0.2670],
+  wacc:      0.3023017,
+  g:         0.02,
+  entityVal: 333891667.24,
+  equityVal: 362991667.24,
+  tvBase:    189932427.20,
+  sumDcff:   143959240.04,
+  tvMatrix: [
+    [196907499.96,200590744.20,204414408.58,208386679.21,212516391.13],
+    [189932427.20,193357080.15,196907499.96,200590744.20,204414408.58],
+    [183434606.01,186626974.81,189932427.20,193357080.15,196907499.96],
+    [177366674.62,180349615.29,183434606.01,186626974.81,189932427.20],
+    [171687337.41,174480802.75,177366674.62,180349615.29,183434606.01]
+  ],
+  sumByCF: [153479902.96,148623605.79,143959240.04,139477683.66,135170318.72]
+};
+
+// ============================
+// HELPERS
+// ============================
+const cD = {
+  responsive:true, maintainAspectRatio:true,
+  plugins:{
+    legend:{labels:{color:'#5a6e84',font:{family:'DM Mono',size:10}}},
+    tooltip:{backgroundColor:'#ffffff',borderColor:'#dde2eb',borderWidth:1,titleColor:'#1a2433',bodyColor:'#5a6e84'}
+  },
+  scales:{
+    x:{ticks:{color:'#5a6e84',font:{family:'DM Mono',size:10}},grid:{color:'rgba(0,0,0,0.06)'}},
+    y:{ticks:{color:'#5a6e84',font:{family:'DM Mono',size:10}},grid:{color:'rgba(0,0,0,0.06)'}}
+  }
+};
+function fmt(n,div=1e6,pre='$',suf='M'){
+  if(n===null||n===undefined||isNaN(n))return'—';
+  const v=n/div;
+  if(Math.abs(v)>=1000)return(n<0?'(':'')+pre+(Math.abs(v)/1000).toFixed(1)+'B'+(n<0?')':'');
+  return(n<0?'(':'')+pre+Math.abs(v).toFixed(1)+suf+(n<0?')':'');
+}
+function fmtPct(n){return(n*100).toFixed(1)+'%'}
+function fmtM(n){return(n/1e6).toFixed(1)+'M'}
+function fmtK(n){if(Math.abs(n)>=1e6)return'$'+(n/1e6).toFixed(2)+'M';return'$'+(n/1e3).toFixed(1)+'K'}
+const PALETTE=['#00e5c3','#f7c843','#e05f5f','#7c9ef8','#2ecc87','#f08030','#b07cfa','#f07ca0','#a0e060','#6b7e96'];
+
+// Register datalabels plugin — disabled globally, enabled per-chart
+Chart.register(ChartDataLabels);
+Chart.defaults.set('plugins.datalabels',{display:false});
+
+// Sector breakdown from Revenue Summary Section V (10-yr TECH5, %)
+const SECTORS = {
+  labels:['Financial Services','G2P/Social','Telecommunications','Health & Insurance','Foundational Identity','Gov & Civil Service','Justice & Public Safety','Other (Education, Transport, Tourism, Utilities, Agriculture, Trade, Digital...)'],
+  pcts:[43.15,10.57,10.39,7.46,4.51,3.47,2.97,17.47],
+  colors:['#f7c843','#00e5c3','#7c9ef8','#e05f5f','#2ecc87','#b07cfa','#f08030','#6b7e96']
+};
+
+function getPop(c,yr){return Math.round(popBase2024[c]*Math.pow(1+(growthRates[c]||0.02),yr-2024))}
+function getTotalPop(yr){return Object.keys(popBase2024).reduce((s,c)=>s+getPop(c,yr),0)}
+
+// Label helpers
+// ── Label helpers (short-form, inside-bar to avoid overflow) ──
+function fmtLbl(v){
+  if(!v||Math.abs(v)<5e5)return'';
+  const m=v/1e6;
+  return(v<0?'(':'')+'$'+(Math.abs(m)>=100?Math.round(Math.abs(m)):Math.abs(m).toFixed(1))+'M'+(v<0?')':'');
+}
+function fmtLblPct(v){return typeof v==='number'?Math.abs(v)>=10?Math.round(v)+'%':v.toFixed(1)+'%':'';}
+
+const DL_M = {   // bar: label sits INSIDE bar top (no overflow)
+  display:true, anchor:'end', align:'start', clamp:true,
+  color:'rgba(30,36,50,0.75)', font:{family:'DM Mono',size:7,weight:'500'},
+  formatter:fmtLbl
+};
+const DL_PCT = {
+  display:true, anchor:'end', align:'start', clamp:true,
+  color:'rgba(30,36,50,0.75)', font:{family:'DM Mono',size:7,weight:'500'},
+  formatter:fmtLblPct
+};
+const DL_LINE = {  // line: label above point, offset keeps it from the dot
+  display:true, anchor:'end', align:'top', offset:3, clamp:true,
+  color:'#7a8fa6', font:{family:'DM Mono',size:7},
+  formatter:fmtLbl
+};
+const DL_LINE_PCT = {
+  display:true, anchor:'end', align:'top', offset:3, clamp:true,
+  color:'#7a8fa6', font:{family:'DM Mono',size:7},
+  formatter:fmtLblPct
+};
+
+function mkChart(id,type,labels,datasets,opts={}){
+  const ctx=document.getElementById(id);if(!ctx)return;
+  new Chart(ctx,{type,data:{labels,datasets},options:{...cD,...opts},plugins:[ChartDataLabels]});
+}
+
+// ============================
+// AFS
+// ============================
+function renderOverview(){
+  // Combined Revenue KPIs
+  const k=document.getElementById('kpi-afs');
+  const cum=D.totalRev.reduce((a,b)=>a+b,0);
+  k.innerHTML=`
+    <div class="kpi"><div class="kpi-label">2031 Revenue</div><div class="kpi-value">${fmt(D.totalRev[4])}</div><div class="kpi-sub up">+29% YoY</div></div>
+    <div class="kpi yellow"><div class="kpi-label">2031 Op Income</div><div class="kpi-value">${fmt(D.opIncome[4])}</div><div class="kpi-sub">Op Margin ${fmtPct(D.opMargin[4])}</div></div>
+    <div class="kpi"><div class="kpi-label">2031 Net Income</div><div class="kpi-value">${fmt(D.netIncome[4])}</div><div class="kpi-sub">Net Margin ${fmtPct(D.netMargin[4])}</div></div>
+    <div class="kpi blue"><div class="kpi-label">5yr Cumulative Rev</div><div class="kpi-value">${fmt(cum,1e9,'$','B')}</div><div class="kpi-sub up">~$1B milestone</div></div>
+    <div class="kpi red"><div class="kpi-label">L3 Transactions (2031)</div><div class="kpi-value">${fmt(D.revL3[4])}</div><div class="kpi-sub">${fmtPct(D.revL3[4]/D.totalRev[4])} of Rev</div></div>
+  `;
+
+  // Revenue stacked
+  mkChart('chart-rev-stack','bar',years.map(String),[
+    {label:'L2 Platform',data:D.revL2,backgroundColor:'rgba(124,158,248,0.8)',datalabels:{display:false}},
+    {label:'L3 Transactions',data:D.revL3,backgroundColor:'rgba(0,168,150,0.75)',datalabels:{display:false}},
+    {label:'Payments',data:D.payments,backgroundColor:'rgba(200,154,16,0.8)',
+     datalabels:{display:true,anchor:'end',align:'top',clamp:true,color:'#5a6e84',font:{family:'DM Mono',size:7},
+       formatter:(_,ctx2)=>{const i=ctx2.dataIndex;return fmtLbl(D.revL2[i]+D.revL3[i]+D.payments[i]);}}}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:{stacked:true,...cD.scales.x},y:{stacked:true,...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}});
+
+  // Revenue vs costs
+  mkChart('chart-rev-opex','bar',years.map(String),[
+    {label:'Total Revenue',data:D.totalRev,backgroundColor:'rgba(0,168,150,0.7)',borderColor:'#00a896',borderWidth:1.5,datalabels:DL_M},
+    {label:'Direct Costs',data:D.directCost,backgroundColor:'rgba(230,57,70,0.55)',borderColor:'#E63946',borderWidth:1.5,datalabels:{display:false}},
+    {label:'Total OpEx',data:D.totalOpex,backgroundColor:'rgba(200,154,16,0.55)',borderColor:'#c89a10',borderWidth:1.5,datalabels:{display:false}}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{...cD.scales.y.ticks,callback:v=>'$'+fmtM(v)}}}});
+
+  // Income lines
+  mkChart('chart-income','line',years.map(String),[
+    {label:'Operating Income',data:D.opIncome,borderColor:'#00a896',backgroundColor:'rgba(0,168,150,0.1)',tension:0.4,fill:true,pointRadius:4,datalabels:{...DL_LINE,color:'#00a896'}},
+    {label:'Net Income',data:D.netIncome,borderColor:'#c89a10',backgroundColor:'rgba(200,154,16,0.08)',tension:0.4,fill:false,pointRadius:4,datalabels:{...DL_LINE,color:'#c89a10',align:'bottom'}}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{...cD.scales.y.ticks,callback:v=>'$'+fmtM(v)}}}});
+
+  // Margin line (compact duplicate in overview)
+  mkChart('chart-margins-line-2','line',years.map(String),[
+    {label:'Op Margin',data:D.opMargin.map(v=>v*100),borderColor:'#4a6ee0',tension:0.4,fill:false,pointRadius:4,datalabels:{...DL_LINE_PCT,color:'#4a6ee0'}},
+    {label:'Net Margin',data:D.netMargin.map(v=>v*100),borderColor:'#E63946',tension:0.4,fill:false,pointRadius:4,datalabels:{...DL_LINE_PCT,color:'#E63946',align:'bottom'}}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>v.toFixed(0)+'%'}}}});
+
+  // P&L Table
+  const t=document.getElementById('tbl-pnl');
+  const rows=[
+    ['Total Revenue',D.totalRev,false,true],['— Direct Costs',D.directCost.map(v=>-v),false,false],
+    ['Gross Margin',D.grossMar,false,true],['— Total OpEx',D.totalOpex.map(v=>-v),false,false],
+    ['Operating Income',D.opIncome,false,true],['Op Margin %',D.opMargin,true,true],
+    ['Depreciation & Amort.',D.deprec.map(v=>-v),false,false],['PBIT',D.pbit,false,true],
+    ['— Corporate Tax',D.corpTax.map(v=>-v),false,false],['Net Income',D.netIncome,false,true],
+    ['Net Margin %',D.netMargin,true,true],
+  ];
+  t.innerHTML=`<thead><tr><th>Metric</th>${years.map(y=>`<th>${y}</th>`).join('')}</tr></thead><tbody>
+  ${rows.map(([lbl,vals,isPct,isKey])=>`<tr class="${isKey?'total-row':''}"><td>${lbl}</td>${vals.map(v=>{
+    const s=isPct?fmtPct(v):fmt(v);
+    return`<td class="${!isPct&&v<0?'neg':(!isPct&&v>0&&isKey?'pos':'')}">${s}</td>`;
+  }).join('')}</tr>`).join('')}</tbody>`;
+
+  // Sector treemap (D3)
+  renderSectorTreemap();
+}
+
+// ============================
+// D3 TREEMAP HELPERS
+// ============================
+function renderSectorTreemap(){
+  const el = document.getElementById('treemap-sector');
+  if(!el||!window.d3) return;
+  el.innerHTML='';
+  const W=el.offsetWidth||700, H=320;
+  const data={name:'root',children:SECTORS.labels.map((lbl,i)=>({name:lbl,value:SECTORS.pcts[i],color:SECTORS.colors[i]}))};
+  const root=d3.hierarchy(data).sum(d=>d.value).sort((a,b)=>b.value-a.value);
+  d3.treemap().size([W,H]).padding(3).round(true)(root);
+  const svg=d3.select(el).append('svg').attr('width','100%').attr('height',H).attr('viewBox',`0 0 ${W} ${H}`);
+  const cell=svg.selectAll('g').data(root.leaves()).join('g').attr('transform',d=>`translate(${d.x0},${d.y0})`);
+  cell.append('rect').attr('width',d=>Math.max(0,d.x1-d.x0)).attr('height',d=>Math.max(0,d.y1-d.y0))
+    .attr('fill',d=>d.data.color).attr('rx',3).attr('opacity',0.85);
+  // Short display name for treemap cells
+  const sectorShort = l => {
+    const m={'Financial Services':'Financial Svcs','G2P/Social':'G2P/Social','Telecommunications':'Telecom',
+      'Health & Insurance':'Health','Foundational Identity':'Foundational ID','Gov & Civil Service':'Gov & Civil',
+      'Justice & Public Safety':'Justice'};
+    if(m[l])return m[l];
+    if(l.startsWith('Other'))return 'Other';
+    return l.length>18?l.slice(0,16)+'…':l;
+  };
+  cell.append('text').attr('x',5).attr('y',16).attr('fill','#fff').attr('font-size','10px')
+    .attr('font-family','DM Mono').attr('font-weight','700')
+    .text(d=>{ const w=d.x1-d.x0; return w>55?sectorShort(d.data.name):''; });
+  cell.append('text').attr('x',5).attr('y',30).attr('fill','rgba(255,255,255,0.88)').attr('font-size','11px')
+    .attr('font-family','DM Mono').attr('font-weight','600')
+    .text(d=>{ const w=d.x1-d.x0,h=d.y1-d.y0; return (w>55&&h>28)?d.data.value.toFixed(1)+'%':''; });
+  cell.append('title').text(d=>`${d.data.name}: ${d.data.value.toFixed(2)}%`);
+}
+
+function renderCountryTreemap(){
+  const el = document.getElementById('treemap-country');
+  if(!el||!window.d3) return;
+  el.innerHTML='';
+  const W=el.offsetWidth||600, H=300;
+
+  // Unique color per country (vibrant, distinct palette)
+  const countryClr={
+    'Ethiopia':'#E63946','Tanzania':'#457B9D','Colombia':'#F4A261','Peru':'#2A9D8F',
+    'Uganda':'#FFBE0B','Zambia':'#3A86FF','Guatemala':'#7209B7','Honduras':'#06D6A0',
+    'Senegal':'#FB5607','Papua New Guinea':'#EF476F','Somalia':'#06B6D4',
+    'Botswana':'#8338EC','Mauritius':'#84CC16','Djibouti':'#FF9F1C',
+    'Timor-Leste':'#4361EE','Fiji':'#E9C46A','Comoros':'#6D6875'
+  };
+
+  const totalCumul=Object.keys(countryRev).reduce((s,c2)=>(countryRev[c2]||[]).reduce((a,b)=>a+b,0)+s,0);
+
+  const treeData={name:'root',children:Object.keys(countryRev).map(c2=>{
+    const cumul=(countryRev[c2]||[]).reduce((s,v)=>s+v,0);
+    const pct=(cumul/totalCumul*100).toFixed(1);
+    return{name:c2,value:cumul,pct,color:countryClr[c2]||'#6b7e96'};
+  })};
+
+  const root=d3.hierarchy(treeData).sum(d=>d.value).sort((a,b)=>b.value-a.value);
+  d3.treemap().size([W,H]).padding(2).round(true)(root);
+  const svg=d3.select(el).append('svg').attr('width','100%').attr('height',H).attr('viewBox',`0 0 ${W} ${H}`);
+  const cell=svg.selectAll('g').data(root.leaves()).join('g').attr('transform',d=>`translate(${d.x0},${d.y0})`);
+
+  cell.append('rect')
+    .attr('width',d=>Math.max(0,d.x1-d.x0)).attr('height',d=>Math.max(0,d.y1-d.y0))
+    .attr('fill',d=>d.data.color).attr('rx',3).attr('opacity',0.88);
+
+  // Country name
+  cell.append('text').attr('x',5).attr('y',15).attr('fill','#fff')
+    .attr('font-size','9px').attr('font-family','DM Mono').attr('font-weight','700')
+    .text(d=>{ const w=d.x1-d.x0; return w>60?d.data.name.split(' ')[0]:''; });
+
+  // Amount
+  cell.append('text').attr('x',5).attr('y',27).attr('fill','rgba(255,255,255,0.9)')
+    .attr('font-size','8px').attr('font-family','DM Mono')
+    .text(d=>{ const w=d.x1-d.x0,h=d.y1-d.y0; return (w>60&&h>32)?fmtLbl(d.data.value):''; });
+
+  // % label
+  cell.append('text').attr('x',5).attr('y',39).attr('fill','rgba(255,255,255,0.75)')
+    .attr('font-size','8px').attr('font-family','DM Mono')
+    .text(d=>{ const w=d.x1-d.x0,h=d.y1-d.y0; return (w>60&&h>45)?d.data.pct+'%':''; });
+
+  cell.append('title').text(d=>`${d.data.name}
+${fmtLbl(d.data.value)} — ${d.data.pct}% of portfolio`);
+}
+
+// ============================
+// COSTS
+// ============================
+function renderCosts(){
+  const cumDC=D.directCost.reduce((a,b)=>a+b,0);
+  const cumOX=D.totalOpex.reduce((a,b)=>a+b,0);
+  const cumPY=D.payroll.reduce((a,b)=>a+b,0);
+  const cumTC=cumDC+cumOX;
+  const k=document.getElementById('kpi-costs');
+  k.innerHTML=`
+    <div class="kpi red"><div class="kpi-label">Direct Costs (5yr)</div><div class="kpi-value">${fmt(cumDC)}</div><div class="kpi-sub">${fmtPct(cumDC/cumTC)} of total costs</div></div>
+    <div class="kpi yellow"><div class="kpi-label">Direct + OpEx / Total (5yr)</div><div class="kpi-value">${fmt(cumTC)}</div><div class="kpi-sub">All cost categories combined</div></div>
+    <div class="kpi blue"><div class="kpi-label">HR / Payroll (5yr)</div><div class="kpi-value">${fmt(cumPY)}</div><div class="kpi-sub">${fmtPct(cumPY/cumOX)} of indirect OpEx</div></div>
+    <div class="kpi"><div class="kpi-label">Start-Up CAPEX (2027–2029)</div><div class="kpi-value">$30.0M</div><div class="kpi-sub">Series B funded · 100% equity</div></div>
+  `;
+
+  // 3-driver bar: Direct, Total, Payroll grouped
+  const totalCost = years.map((_,i)=>D.directCost[i]+D.totalOpex[i]);
+  mkChart('chart-cost-drivers','bar',years.map(String),[
+    {label:'Direct Costs',data:D.directCost,backgroundColor:'rgba(230,57,70,0.82)',borderRadius:3,
+     datalabels:{...DL_M,color:'rgba(30,36,50,0.8)'}},
+    {label:'Direct + OpEx (Total)',data:totalCost,backgroundColor:'rgba(74,110,224,0.78)',borderRadius:3,
+     datalabels:{...DL_M,color:'rgba(30,36,50,0.8)'}},
+    {label:'HR / Payroll',data:D.payroll,backgroundColor:'rgba(29,161,242,0.82)',borderRadius:3,
+     datalabels:{...DL_M,color:'rgba(30,36,50,0.8)'}}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},
+     scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}});
+
+  // Cost % of revenue (endpoint only)
+  const opexPct=years.map((_,i)=>D.totalOpex[i]/D.totalRev[i]*100);
+  const dcPct=years.map((_,i)=>D.directCost[i]/D.totalRev[i]*100);
+  const totCostPct=years.map((_,i)=>(D.totalOpex[i]+D.directCost[i])/D.totalRev[i]*100);
+  mkChart('chart-costs-pct','line',years.map(String),[
+    {label:'Total Cost / Revenue',data:totCostPct,borderColor:'#E63946',tension:0.4,pointRadius:4,
+     datalabels:{display:(ctx)=>ctx.dataIndex===years.length-1,anchor:'end',align:'right',clamp:true,color:'#E63946',font:{family:'DM Mono',size:7},formatter:fmtLblPct}},
+    {label:'Indirect OpEx / Revenue',data:opexPct,borderColor:'#4a6ee0',tension:0.4,pointRadius:4,
+     datalabels:{display:(ctx)=>ctx.dataIndex===years.length-1,anchor:'end',align:'right',clamp:true,color:'#4a6ee0',font:{family:'DM Mono',size:7},formatter:fmtLblPct}},
+    {label:'Direct Cost / Revenue',data:dcPct,borderColor:'#c89a10',tension:0.4,pointRadius:4,
+     datalabels:{display:(ctx)=>ctx.dataIndex===years.length-1,anchor:'end',align:'right',clamp:true,color:'#c89a10',font:{family:'DM Mono',size:7},formatter:fmtLblPct}}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>v.toFixed(0)+'%'}}}});
+
+  // Stacked bar (all categories, total on top)
+  const _stackTotalLbl = {
+    display:true, anchor:'end', align:'top', clamp:true, offset:2,
+    color:'#5a6e84', font:{family:'DM Mono',size:7},
+    formatter:(_,ctx2)=>{
+      const i=ctx2.dataIndex;
+      const tot=[D.directCost,D.payroll,D.marketing,D.bizdev,D.training,D.fixedOH,D.maint,D.rnd]
+        .reduce((s,arr)=>s+(arr[i]||0),0);
+      return fmtLbl(tot);
+    }
+  };
+  mkChart('chart-costs-stack','bar',years.map(String),[
+    {label:'Direct Costs',data:D.directCost,backgroundColor:'rgba(230,57,70,0.85)',datalabels:{display:false}},
+    {label:'HR / Payroll',data:D.payroll,backgroundColor:'rgba(29,161,242,0.85)',datalabels:{display:false}},
+    {label:'Marketing',data:D.marketing,backgroundColor:'rgba(67,97,238,0.80)',datalabels:{display:false}},
+    {label:'Biz Dev',data:D.bizdev,backgroundColor:'rgba(114,9,183,0.80)',datalabels:{display:false}},
+    {label:'Training',data:D.training,backgroundColor:'rgba(6,182,212,0.80)',datalabels:{display:false}},
+    {label:'Fixed OH',data:D.fixedOH,backgroundColor:'rgba(42,157,143,0.80)',datalabels:{display:false}},
+    {label:'Maintenance',data:D.maint,backgroundColor:'rgba(132,204,22,0.80)',datalabels:{display:false}},
+    {label:'R&D',data:D.rnd,backgroundColor:'rgba(233,30,99,0.85)',datalabels:_stackTotalLbl}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:{stacked:true,...cD.scales.x},y:{stacked:true,...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}});
+
+  // Cost detail table
+  const t=document.getElementById('tbl-costs');
+  const rows=[
+    ['Total Revenue',D.totalRev],
+    ['Direct Costs',D.directCost],
+    ['— Payroll',D.payroll],['— Marketing',D.marketing],['— Biz Dev',D.bizdev],
+    ['— Training',D.training],['— Fixed Overheads',D.fixedOH],['— Maintenance',D.maint],['— R&D',D.rnd],
+    ['Total OpEx (Indirect)',D.totalOpex],
+    ['Total Costs',years.map((_,i)=>D.directCost[i]+D.totalOpex[i])],
+    ['Gross Margin',D.grossMar],
+  ];
+  t.innerHTML=`<thead><tr><th>Item</th>${years.map(y=>`<th>${y}</th>`).join('')}</tr></thead><tbody>
+  ${rows.map(([lbl,vals])=>{
+    const isTot=lbl.startsWith('Total')||lbl==='Gross Margin';
+    return`<tr class="${isTot?'total-row':''}"><td>${lbl}</td>${vals.map(v=>`<td>${fmt(v)}</td>`).join('')}</tr>`;
+  }).join('')}</tbody>`;
+}
+
+// ============================
+// MARGINS
+// ============================
+function renderMargins(){
+  const k=document.getElementById('kpi-margins');
+  const peakOpIdx=D.opMargin.indexOf(Math.max(...D.opMargin));
+  const peakNetIdx=D.netMargin.indexOf(Math.max(...D.netMargin));
+  k.innerHTML=`
+    <div class="kpi"><div class="kpi-label">Peak Op Margin</div><div class="kpi-value">${fmtPct(Math.max(...D.opMargin))}</div><div class="kpi-sub">${years[peakOpIdx]}</div></div>
+    <div class="kpi yellow"><div class="kpi-label">Peak Net Margin</div><div class="kpi-value">${fmtPct(Math.max(...D.netMargin))}</div><div class="kpi-sub">${years[peakNetIdx]}</div></div>
+    <div class="kpi blue"><div class="kpi-label">2031 Op Margin</div><div class="kpi-value">${fmtPct(D.opMargin[4])}</div><div class="kpi-sub">Stabilising</div></div>
+    <div class="kpi red"><div class="kpi-label">2027 (Ramp)</div><div class="kpi-value">${fmtPct(D.opMargin[0])}</div><div class="kpi-sub down">Investment year</div></div>
+  `;
+  mkChart('chart-margins-line','line',years.map(String),[
+    {label:'Operating Margin',data:D.opMargin.map(v=>v*100),borderColor:'#00e5c3',tension:0.4,fill:false,pointRadius:4,datalabels:{...DL_LINE_PCT,color:'#00e5c3'}},
+    {label:'Net Margin',data:D.netMargin.map(v=>v*100),borderColor:'#f7c843',tension:0.4,fill:false,pointRadius:4,datalabels:{...DL_LINE_PCT,color:'#f7c843',align:'bottom'}}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>v.toFixed(0)+'%'}}}});
+  mkChart('chart-gm-ni','bar',years.map(String),[
+    {label:'Gross Margin',data:D.grossMar,backgroundColor:'rgba(0,229,195,0.6)',datalabels:DL_M},
+    {label:'Net Income',data:D.netIncome,backgroundColor:'rgba(247,200,67,0.7)',datalabels:{display:false}}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}});
+
+}
+
+// ============================
+// RAMP
+// ============================
+function renderRamp(){
+  const countries=Object.keys(countryRev);
+  const maxRev=Math.max(...countries.map(c=>(countryRev[c]||[])[4]||0));
+
+  // Group by live year, then quarter within year
+  const yearGroups={2027:[],2028:[],2029:[]};
+  const qOrder={'Q1':1,'Q2':2,'Q3':3,'Q4':4};
+  countries.forEach(c=>{
+    const d=turnOnDates[c]||'2029 Q4';
+    const yr=parseInt(d.split(' ')[0]);
+    const bucket=yearGroups[yr]||yearGroups[2029];
+    bucket.push(c);
+  });
+  Object.values(yearGroups).forEach(grp=>grp.sort((a,b)=>{
+    const qa=(turnOnDates[a]||'').split(' ')[1]||'Q4';
+    const qb=(turnOnDates[b]||'').split(' ')[1]||'Q4';
+    return (qOrder[qa]||4)-(qOrder[qb]||4);
+  }));
+
+  const yearColors={2027:'#00e5c3',2028:'#f7c843',2029:'#7c9ef8'};
+  const yearLabels={2027:'Wave 1 — 2027',2028:'Wave 2 — 2028',2029:'Wave 3 — 2029'};
+  let html='';
+  [2027,2028,2029].forEach(yr=>{
+    const grp=yearGroups[yr];
+    if(!grp||!grp.length)return;
+    html+=`<div style="grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:6px 0 2px">
+      <div style="font-family:'DM Serif Display',serif;font-size:15px;color:${yearColors[yr]}">${yearLabels[yr]}</div>
+      <div style="flex:1;height:1px;background:${yearColors[yr]}33"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">${grp.length} countr${grp.length===1?'y':'ies'}</div>
+    </div>`;
+    grp.forEach(c=>{
+      const arch=archetypes[c]||'Gazelle';
+      const color=archetypeColors[arch];
+      const rev2031=(countryRev[c]||[])[4]||0;
+      const pct=Math.min(100,rev2031/maxRev*100).toFixed(1);
+      const pop=(getPop(c,2027)/1e6).toFixed(1);
+      const rpc2031=rev2031>0?(rev2031/getPop(c,2031)).toFixed(3):'—';
+      html+=`<div class="country-card" style="border-top:2px solid ${yearColors[yr]}44">
+        <div class="country-name">${c}</div>
+        <div class="country-type" style="color:${color}">${arch}</div>
+        <div class="country-turn-on">⚡ Live: ${turnOnDates[c]||'—'}</div>
+        <div class="country-pop">Pop 2027: ${pop}M</div>
+        <div class="country-pop">Rev 2031: ${fmt(rev2031)}</div>
+        <div class="country-pop">Rev/Cap 2031: $${rpc2031}</div>
+        <div class="ramp-bar"><div class="ramp-bar-fill" style="width:${pct}%;background:${color}88"></div></div>
+      </div>`;
+    });
+  });
+  document.getElementById('country-cards').innerHTML=html;
+
+  // Revenue start year: first year with non-zero Operations revenue
+  const revStartYr = {};
+  Object.keys(countryRev).forEach(c2=>{
+    const idx = (countryRev[c2]||[]).findIndex(v=>v>0);
+    revStartYr[c2] = idx >= 0 ? years[idx] : 2031;
+  });
+
+  // Start-year cohort colours (revenue-based, not contract-based)
+  const startYrColor = {2027:'#00a896', 2028:'#4a6ee0', 2029:'#c89a10'};
+  const startYrName  = {2027:'Rev from 2027', 2028:'Rev from 2028', 2029:'Rev from 2029'};
+
+  // Cumulative totals, sorted descending
+  const cumulTotals = {};
+  Object.keys(countryRev).forEach(c2=>{
+    cumulTotals[c2] = (countryRev[c2]||[]).reduce((s,v)=>s+v, 0);
+  });
+  const allSortedCumul = [...countries].sort((a,b)=>cumulTotals[b]-cumulTotals[a]);
+
+  // chart-country-bar: horizontal cumulative, coloured by revenue start year
+  const ctx_cb = document.getElementById('chart-country-bar');
+  if(ctx_cb){
+    // Build one dataset per start-year cohort so legend shows cohort colours
+    const cohorts = [2027,2028,2029];
+    const datasets_cb = cohorts.map(sy=>{
+      return {
+        label: startYrName[sy],
+        data: allSortedCumul.map(c2=> revStartYr[c2]===sy ? cumulTotals[c2] : 0),
+        backgroundColor: startYrColor[sy]+'cc',
+        borderColor: startYrColor[sy],
+        borderWidth: 1,
+        borderRadius: 3,
+        datalabels:{
+          display: (ctx2)=>{ const v=ctx2.dataset.data[ctx2.dataIndex]; return v>0; },
+          anchor:'end', align:'end', clamp:true,
+          color:'rgba(30,36,50,0.75)', font:{family:'DM Mono',size:7},
+          formatter: fmtLbl
+        }
+      };
+    });
+    new Chart(ctx_cb,{
+      type:'bar',
+      data:{labels:allSortedCumul, datasets:datasets_cb},
+      options:{indexAxis:'y', responsive:true, maintainAspectRatio:true,
+        plugins:{...cD.plugins, datalabels:{display:'auto'},
+          legend:{labels:{color:'#5a6e84',font:{family:'DM Mono',size:9}}}},
+        scales:{
+          x:{stacked:true,...cD.scales.x,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}},
+          y:{stacked:true,...cD.scales.y}
+        }},
+      plugins:[ChartDataLabels]
+    });
+  }
+
+  // chart-country-trend: stacked area of cumulative build by revenue-start cohort
+  const cohortCumul = {};
+  [2027,2028,2029].forEach(sy=>{
+    let runSum = 0;
+    cohortCumul[sy] = years.map((_,yi)=>{
+      const yearAdd = Object.keys(countryRev)
+        .filter(c2=>revStartYr[c2]===sy)
+        .reduce((s,c2)=>s+(countryRev[c2]?.[yi]||0),0);
+      runSum += yearAdd;
+      return runSum;
+    });
+  });
+
+  const ctx_ct = document.getElementById('chart-country-trend');
+  if(ctx_ct) new Chart(ctx_ct,{
+    type:'line',
+    data:{labels:years.map(String), datasets:[
+      {label:'2027 Cohort',data:cohortCumul[2027],borderColor:'#00a896',
+       backgroundColor:'rgba(0,168,150,0.12)',fill:true,tension:0.4,pointRadius:4,
+       datalabels:{display:(ctx2)=>ctx2.dataIndex===years.length-1,anchor:'end',align:'right',
+         clamp:true,color:'#00a896',font:{family:'DM Mono',size:7,weight:'600'},formatter:fmtLbl}},
+      {label:'2028 Cohort',data:cohortCumul[2028],borderColor:'#4a6ee0',
+       backgroundColor:'rgba(74,110,224,0.10)',fill:true,tension:0.4,pointRadius:4,
+       datalabels:{display:(ctx2)=>ctx2.dataIndex===years.length-1,anchor:'end',align:'right',
+         clamp:true,color:'#4a6ee0',font:{family:'DM Mono',size:7,weight:'600'},formatter:fmtLbl}},
+      {label:'2029 Cohort',data:cohortCumul[2029],borderColor:'#c89a10',
+       backgroundColor:'rgba(200,154,16,0.08)',fill:true,tension:0.4,pointRadius:4,
+       datalabels:{display:(ctx2)=>ctx2.dataIndex===years.length-1,anchor:'end',align:'right',
+         clamp:true,color:'#c89a10',font:{family:'DM Mono',size:7,weight:'600'},formatter:fmtLbl}},
+    ]},
+    options:{responsive:true, maintainAspectRatio:true,
+      plugins:{...cD.plugins, datalabels:{display:'auto'},
+        legend:{labels:{color:'#5a6e84',font:{family:'DM Mono',size:9}}}},
+      scales:{x:cD.scales.x, y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}},
+    plugins:[ChartDataLabels]
+  });
+
+  // Wave annual totals for waterfall
+  const waveGroups2 = {
+    2027: ['Papua New Guinea','Ethiopia','Somalia','Honduras','Senegal','Botswana','Djibouti','Zambia'],
+    2028: ['Tanzania','Uganda','Comoros','Timor-Leste','Colombia','Guatemala','Mauritius','Peru'],
+    2029: ['Fiji']
+  };
+  const waveColors2 = {'2027':'rgba(0,168,150,0.85)','2028':'rgba(74,110,224,0.80)','2029':'rgba(245,158,11,0.85)'};
+  const waveAnnual = {};
+  [2027,2028,2029].forEach(wy=>{
+    waveAnnual[wy] = years.map((_,yi)=>
+      (waveGroups2[wy]||[]).reduce((s,c2)=>s+(countryRev[c2]?.[yi]||0),0)
+    );
+  });
+  // Running cumulative
+  const annualTotals = years.map((_,i)=>D.totalRev[i]);
+  const runCumul = annualTotals.reduce((acc,v,i)=>{acc.push((acc[i-1]||0)+v);return acc;},[]);
+
+  const ctxWW = document.getElementById('chart-wave-waterfall');
+  if(ctxWW) new Chart(ctxWW,{
+    data:{labels:years.map(String),datasets:[
+      {type:'bar',label:'Wave 1 (2027)',data:waveAnnual[2027],backgroundColor:waveColors2[2027],stack:'s',datalabels:{display:false}},
+      {type:'bar',label:'Wave 2 (2028)',data:waveAnnual[2028],backgroundColor:waveColors2[2028],stack:'s',datalabels:{display:false}},
+      {type:'bar',label:'Wave 3 (2029)',data:waveAnnual[2029],backgroundColor:waveColors2[2029],stack:'s',
+       datalabels:{display:true,anchor:'end',align:'top',clamp:true,color:'#5a6e84',font:{family:'DM Mono',size:7},
+         formatter:(_,ctx2)=>{const i=ctx2.dataIndex;return fmtLbl(annualTotals[i]);}}},
+      {type:'line',label:'Cumulative Total',data:runCumul,borderColor:'#E63946',backgroundColor:'rgba(230,57,70,0.08)',
+       fill:true,tension:0.4,pointRadius:5,pointBackgroundColor:'#E63946',borderWidth:2,
+       datalabels:{display:true,anchor:'end',align:'top',offset:4,clamp:true,color:'#E63946',font:{family:'DM Mono',size:7,weight:'600'},formatter:fmtLbl},
+       yAxisID:'y2'}
+    ]},
+    options:{...cD,plugins:{...cD.plugins,datalabels:{display:'auto'},
+      legend:{labels:{color:'#5a6e84',font:{family:'DM Mono',size:10}}}},
+      scales:{
+        x:{stacked:true,...cD.scales.x},
+        y:{stacked:true,...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)},title:{display:true,text:'Annual Rev',color:'#5a6e84',font:{size:9}}},
+        y2:{position:'right',grid:{display:false},ticks:{color:'#E63946',font:{family:'DM Mono',size:9},callback:v=>'$'+(v/1e6).toFixed(0)+'M'},title:{display:true,text:'Cumulative',color:'#E63946',font:{size:9}}}
+      }},
+    plugins:[ChartDataLabels]
+  });
+
+  // Country cumulative totals
+  const countryCumulMap = {};
+  Object.keys(countryRev).forEach(c2=>{countryCumulMap[c2]=(countryRev[c2]||[]).reduce((s,v)=>s+v,0);});
+  const sortedByCumul = Object.keys(countryRev).sort((a,b)=>countryCumulMap[b]-countryCumulMap[a]);
+
+  const ctxCC = document.getElementById('chart-country-cumul');
+  if(ctxCC) new Chart(ctxCC,{
+    type:'bar',
+    data:{labels:sortedByCumul,datasets:[{
+      label:'Cumulative 2027–2031',
+      data:sortedByCumul.map(c2=>countryCumulMap[c2]),
+      backgroundColor:sortedByCumul.map(c2=>archetypeColors[archetypes[c2]||'Hummingbird']+'cc'),
+      borderRadius:3,
+      datalabels:{display:true,anchor:'end',align:'end',clamp:true,color:'rgba(30,36,50,0.7)',font:{family:'DM Mono',size:7},formatter:fmtLbl}
+    }]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,
+      plugins:{...cD.plugins,datalabels:{display:'auto'},legend:{display:false}},
+      scales:{x:{...cD.scales.x,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}},y:{...cD.scales.y}}},
+    plugins:[ChartDataLabels]
+  });
+
+  // Running cumulative per top-6 country (line)
+  const top6Cumul = sortedByCumul.slice(0,6);
+  const ctxCT = document.getElementById('chart-country-cumul-trend');
+  if(ctxCT) new Chart(ctxCT,{
+    type:'line',
+    data:{labels:years.map(String),datasets:top6Cumul.map((c2,i)=>{
+      let runningSum=0;
+      const cumulData=years.map((_,yi)=>{runningSum+=(countryRev[c2]?.[yi]||0);return runningSum;});
+      return{label:c2,data:cumulData,borderColor:PALETTE[i%PALETTE.length],tension:0.4,pointRadius:4,fill:false,
+        datalabels:{display:(ctx2)=>ctx2.dataIndex===years.length-1,anchor:'end',align:'right',clamp:true,
+          color:PALETTE[i%PALETTE.length],font:{family:'DM Mono',size:7},formatter:fmtLbl}};
+    })},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{...cD.plugins,datalabels:{display:'auto'},legend:{labels:{color:'#5a6e84',font:{family:'DM Mono',size:9}}}},
+      scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}},
+    plugins:[ChartDataLabels]
+  });
+
+  // Render D3 treemaps
+  setTimeout(renderCountryTreemap, 100);
+
+  const t=document.getElementById('tbl-countries');
+  const hdrs=['Country','Archetype','Live','...'+years[0],...years.slice(1).map(String),'Rev/Cap 2027','Rev/Cap 2031'];
+  t.innerHTML=`<thead><tr>${hdrs.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>
+  ${[2027,2028,2029].flatMap(yr=>{
+    const grp=yearGroups[yr]||[];
+    if(!grp.length)return[];
+    const hdrRow=`<tr><td colspan="${hdrs.length}" style="color:${yearColors[yr]};font-family:'DM Serif Display',serif;font-size:13px;padding:10px 12px 4px;background:rgba(0,0,0,0.15)">${yearLabels[yr]}</td></tr>`;
+    const rows=grp.map(c=>{
+      const revs=countryRev[c]||Array(5).fill(0);
+      const arch=archetypes[c]||'';
+      const color=archetypeColors[arch]||'#6b7e96';
+      const rpc27=revs[0]>0?'$'+(revs[0]/getPop(c,2027)).toFixed(4):'—';
+      const rpc31=revs[4]>0?'$'+(revs[4]/getPop(c,2031)).toFixed(4):'—';
+      return`<tr><td>${c}</td><td style="color:${color}">${arch}</td>
+        <td style="color:#f7c843;font-family:'DM Mono',monospace;font-size:11px">${turnOnDates[c]||'—'}</td>
+        ${revs.map(v=>`<td>${v>0?fmt(v):'—'}</td>`).join('')}
+        <td style="color:#7c9ef8">${rpc27}</td>
+        <td style="color:#00e5c3">${rpc31}</td>
+      </tr>`;
+    });
+    return[hdrRow,...rows];
+  }).join('')}</tbody>`;
+}
+
+// ============================
+// POPULATION
+// ============================
+function renderPopulation(){
+  const popYears=[2024,2025,2026,2027,2028,2029,2030,2031];
+  mkChart('chart-pop-total','line',popYears.map(String),[{
+    label:'Total Population (Millions)',
+    data:popYears.map(y=>getTotalPop(y)/1e6),
+    borderColor:'#7c9ef8',backgroundColor:'rgba(124,158,248,0.1)',tension:0.4,fill:true,pointRadius:4
+  }],{plugins:cD.plugins,scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>v.toFixed(0)+'M'}}}});
+
+  const c27=Object.keys(popBase2024).sort((a,b)=>getPop(b,2027)-getPop(a,2027));
+  mkChart('chart-pop-country','bar',c27,[{
+    label:'Population 2027 (M)',data:c27.map(c=>getPop(c,2027)/1e6),
+    backgroundColor:c27.map(c=>archetypeColors[archetypes[c]||'Gazelle']+'cc'),borderRadius:3
+  }],{indexAxis:'y',plugins:cD.plugins,scales:{x:{...cD.scales.x,ticks:{color:'#5a6e84',callback:v=>v.toFixed(0)+'M'}},y:cD.scales.y}});
+
+  const revPop=years.map((y,i)=>D.totalRev[i]/getTotalPop(y));
+  mkChart('chart-rev-pop','bar',years.map(String),[{
+    label:'Revenue per Capita (USD)',data:revPop,
+    backgroundColor:revPop.map((_,i)=>`hsla(${180+i*20},70%,55%,0.8)`),borderRadius:4
+  }],{plugins:cD.plugins,scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+v.toFixed(2)}}}});
+
+  // Per-country rev/cap in 2031
+  const countriesByRPC=Object.keys(countryRev).sort((a,b)=>{
+    const ra=(countryRev[a]?.[4]||0)/getPop(a,2031);
+    const rb=(countryRev[b]?.[4]||0)/getPop(b,2031);
+    return rb-ra;
+  });
+  mkChart('chart-rev-pop-country','bar',countriesByRPC,[{
+    label:'Rev/Capita 2031 (USD)',
+    data:countriesByRPC.map(c=>(countryRev[c]?.[4]||0)/getPop(c,2031)),
+    backgroundColor:countriesByRPC.map(c=>archetypeColors[archetypes[c]||'Gazelle']+'cc'),borderRadius:3
+  }],{indexAxis:'y',plugins:cD.plugins,scales:{x:{...cD.scales.x,ticks:{color:'#5a6e84',callback:v=>'$'+v.toFixed(3)}},y:cD.scales.y}});
+
+  const t=document.getElementById('tbl-population');
+  const tblYears=[2024,2027,2028,2029,2030,2031];
+  t.innerHTML=`<thead><tr><th>Country</th>${tblYears.map(y=>`<th>Pop ${y}</th>`).join('')}<th>Rev/Cap 2027</th><th>Rev/Cap 2029</th><th>Rev/Cap 2031</th></tr></thead><tbody>
+  ${Object.keys(popBase2024).sort((a,b)=>getPop(b,2027)-getPop(a,2027)).map(c=>{
+    const color=archetypeColors[archetypes[c]||'Hummingbird']||'#6b7e96';
+    const revs=countryRev[c]||Array(5).fill(0);
+    return`<tr><td style="color:${color}">${c}</td>
+      ${tblYears.map(y=>`<td>${(getPop(c,y)/1e6).toFixed(2)}M</td>`).join('')}
+      <td>$${(revs[0]/getPop(c,2027)).toFixed(4)}</td>
+      <td>$${(revs[2]/getPop(c,2029)).toFixed(4)}</td>
+      <td>$${(revs[4]/getPop(c,2031)).toFixed(4)}</td>
+    </tr>`;
+  }).join('')}
+  <tr class="total-row"><td>TOTAL</td>
+    ${tblYears.map(y=>`<td>${(getTotalPop(y)/1e6).toFixed(0)}M</td>`).join('')}
+    <td>$${(D.totalRev[0]/getTotalPop(2027)).toFixed(4)}</td>
+    <td>$${(D.totalRev[2]/getTotalPop(2029)).toFixed(4)}</td>
+    <td>$${(D.totalRev[4]/getTotalPop(2031)).toFixed(4)}</td>
+  </tr></tbody>`;
+}
+
+// ============================
+// CASH FLOW
+// ============================
+function renderCashflow(){
+  const k=document.getElementById('kpi-cf');
+  k.innerHTML=`
+    <div class="kpi"><div class="kpi-label">Cash EoP 2031</div><div class="kpi-value">${fmt(D.cashEop[4])}</div><div class="kpi-sub up">Strong position</div></div>
+    <div class="kpi yellow"><div class="kpi-label">Cash EoP 2030</div><div class="kpi-value">${fmt(D.cashEop[3])}</div></div>
+    <div class="kpi blue"><div class="kpi-label">Op CF 2031</div><div class="kpi-value">${fmt(D.netCashOps[4])}</div><div class="kpi-sub up">FCF positive</div></div>
+    <div class="kpi"><div class="kpi-label">CAPEX 2027</div><div class="kpi-value">${fmt(D.capex[0])}</div><div class="kpi-sub">Initial deployment</div></div>
+  `;
+  mkChart('chart-cf-ops','bar',years.map(String),[
+    {label:'Net Cash from Operations',data:D.netCashOps,backgroundColor:'rgba(0,229,195,0.7)',borderRadius:3,datalabels:DL_M},
+    {label:'CAPEX (Outflow)',data:D.capex.map(v=>-v),backgroundColor:'rgba(224,95,95,0.6)',borderRadius:3,datalabels:DL_M}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}});
+  mkChart('chart-cash-bal','line',years.map(String),[{
+    label:'Cash Balance EoP',data:D.cashEop,borderColor:'#00e5c3',backgroundColor:'rgba(0,229,195,0.08)',tension:0.4,fill:true,pointRadius:5
+  }],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}});
+  let cum=-30000000;
+  const cumCF=years.map((_,i)=>{cum+=D.netCashOps[i];return cum;});
+  mkChart('chart-cum-cf','line',years.map(String),[{
+    label:'Cumulative FCF',data:cumCF,borderColor:'#f7c843',
+    backgroundColor:cumCF.map(v=>v>=0?'rgba(247,200,67,0.15)':'rgba(224,95,95,0.15)'),
+    tension:0.4,fill:true,pointRadius:5,pointBackgroundColor:cumCF.map(v=>v>=0?'#f7c843':'#e05f5f')
+  }],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}});
+}
+
+// ============================
+// DCF & VALUATION
+// ============================
+function renderDCF(){
+  // KPI strip from KPIs sheet (Scenario 3 - Baseline)
+  const kpiData = {
+    ebitda:   [-6316733.84, 26857533.74, 167537139.46, 237947716.69, 288340095.49],
+    noplat:   [-4400056.31, 18708190.65, 116701584.57, 165747580.94, 200849472.23],
+    fcf:      [-10781100.92, 12548385.42, 92346044.35, 151879205.41, 188249186.71],
+    roic:     [-65.5, 145.4, 311.8, 325.7, 319.7],
+    roe:      [-17.3, 42.8, 72.8, 50.7, 38.0],
+    staffPct: [-64.2, -26.2, -8.3, -6.4, -5.8]  // staff as % of rev (KPIs sheet)
+  };
+  const ki=document.getElementById('kpi-invest');
+  if(ki) ki.innerHTML=`
+    <div class="kpi blue"><div class="kpi-label">EBITDA (2031)</div><div class="kpi-value">${fmt(kpiData.ebitda[4])}</div><div class="kpi-sub">KPIs sheet · 69.8% margin</div></div>
+    <div class="kpi yellow"><div class="kpi-label">NOPLAT (2031)</div><div class="kpi-value">${fmt(kpiData.noplat[4])}</div><div class="kpi-sub">Net Op Profit Less Adj Tax</div></div>
+    <div class="kpi"><div class="kpi-label">Free Cash Flow (2031)</div><div class="kpi-value">${fmt(kpiData.fcf[4])}</div><div class="kpi-sub">KPIs sheet</div></div>
+    <div class="kpi red"><div class="kpi-label">ROIC (2031)</div><div class="kpi-value">${kpiData.roic[4].toFixed(1)}%</div><div class="kpi-sub">vs ROIC 311.8% in 2029</div></div>
+    <div class="kpi"><div class="kpi-label">ROE (2031)</div><div class="kpi-value">${kpiData.roe[4].toFixed(1)}%</div><div class="kpi-sub">Return on Equity (KPIs)</div></div>
+  `;
+
+  // Uses doughnut
+  const usesLabels=['Platform Implementation','Core IP Purchase','Marketing','Capacity Building',
+    'Market & BizDev','IT & Infrastructure','Establishment','Furniture & Equipment','R&D','Working Capital'];
+  const usesData=[10000000,6000000,2833958,2944711,2052396,1950000,1300000,1220707,1000000,698228];
+  const usesColors=['#4a6ee0','#00a896','#E63946','#F59E0B','#7209B7','#2A9D8F','#06B6D4','#84CC16','#FF8C00','#c89a10'];
+  const ctxUP=document.getElementById('chart-uses-pie');
+  if(ctxUP) new Chart(ctxUP,{type:'doughnut',data:{labels:usesLabels,datasets:[{data:usesData,backgroundColor:usesColors,borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'50%',
+      plugins:{legend:{position:'right',labels:{color:'#5a6e84',font:{family:'DM Mono',size:9},padding:5,
+        generateLabels:ch=>ch.data.labels.map((l,i)=>({text:`${l}: $${(usesData[i]/1e6).toFixed(1)}M`,fillStyle:usesColors[i],strokeStyle:usesColors[i],lineWidth:0,hidden:false,index:i}))}},
+        tooltip:{...cD.plugins.tooltip,callbacks:{label:ctx2=>` $${(ctx2.raw/1e6).toFixed(2)}M (${(ctx2.raw/30000000*100).toFixed(1)}%)`}},
+        datalabels:{display:false}}},
+    plugins:[ChartDataLabels]});
+
+  // KPIs sheet — EBITDA / NOPLAT / FCF by year
+  mkChart('chart-cumul-cf-invest','bar',years.map(String),[
+    {label:'EBITDA',data:kpiData.ebitda,backgroundColor:'rgba(74,110,224,0.8)',borderRadius:3,
+     datalabels:{...DL_M,color:'rgba(30,36,50,0.8)'}},
+    {label:'NOPLAT',data:kpiData.noplat,backgroundColor:'rgba(0,168,150,0.75)',borderRadius:3,
+     datalabels:{display:false}},
+    {label:'Free Cash Flow',data:kpiData.fcf,backgroundColor:'rgba(200,154,16,0.75)',borderRadius:3,
+     datalabels:{display:false}}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}});
+
+  // WACC chips
+  document.getElementById('wacc-chips').innerHTML=`
+    <div class="wacc-chip"><div class="wacc-chip-label">WACC</div><div class="wacc-chip-val">${(DCF.wacc*100).toFixed(1)}%</div></div>
+    <div class="wacc-chip"><div class="wacc-chip-label">Terminal Growth (g)</div><div class="wacc-chip-val">${(DCF.g*100).toFixed(1)}%</div></div>
+    <div class="wacc-chip"><div class="wacc-chip-label">Sum Disc. FCFF</div><div class="wacc-chip-val">$${(DCF.sumDcff/1e6).toFixed(1)}M</div></div>
+    <div class="wacc-chip"><div class="wacc-chip-label">Terminal Value</div><div class="wacc-chip-val">$${(DCF.tvBase/1e6).toFixed(1)}M</div></div>
+    <div class="wacc-chip"><div class="wacc-chip-label">Debt</div><div class="wacc-chip-val">$0</div></div>
+    <div class="wacc-chip"><div class="wacc-chip-label">Cash (BoY)</div><div class="wacc-chip-val">$29.1M</div></div>
+  `;
+
+  mkChart('chart-fcff','bar',years.map(String),[
+    {label:'FCFF',data:DCF.fcff,backgroundColor:DCF.fcff.map(v=>v<0?'rgba(224,95,95,0.7)':'rgba(0,229,195,0.7)'),borderRadius:4,datalabels:DL_M},
+    {label:'Discounted FCFF',data:DCF.discFcff,type:'line',borderColor:'#f7c843',pointRadius:5,fill:false,tension:0.4}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}});
+
+  mkChart('chart-noplat','bar',years.map(String),[
+    {label:'NOPLAT',data:DCF.noplat,backgroundColor:'rgba(124,158,248,0.7)',borderRadius:3,datalabels:DL_M},
+    {label:'D&A Add-back',data:DCF.da,backgroundColor:'rgba(46,204,135,0.6)',borderRadius:3,datalabels:{display:false}},
+    {label:'ΔWorking Capital',data:DCF.wc,backgroundColor:'rgba(247,200,67,0.6)',borderRadius:3,datalabels:{display:false}},
+    {label:'Investments',data:DCF.invest,backgroundColor:'rgba(224,95,95,0.6)',borderRadius:3,datalabels:{display:false}}
+  ],{plugins:{...cD.plugins,datalabels:{display:'auto'}},scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+fmtM(v)}}}});
+
+  // Sensitivity table
+  const gLabels=['g −1%','g −0.5%','g = 2%','g +0.5%','g +1%'];
+  const waccLabels=['WACC −2%','WACC −1%','WACC = 30.2%','WACC +1%','WACC +2%'];
+  let html=`<table class="sensitivity-table"><thead><tr><th></th>${gLabels.map(g=>`<th>${g}</th>`).join('')}</tr></thead><tbody>`;
+  DCF.tvMatrix.forEach((row,wi)=>{
+    html+=`<tr>`;
+    html+=`<td style="text-align:left;color:#5a6e84;font-family:'DM Mono',monospace;font-size:10px">${waccLabels[wi]}</td>`;
+    row.forEach((val,gi)=>{
+      const isBase=wi===2&&gi===2;
+      html+=`<td class="${isBase?'highlight':''}">$${(val/1e6).toFixed(1)}M</td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody></table>`;
+  document.getElementById('sensitivity-tv').innerHTML=html;
+
+  mkChart('chart-wacc-sum','bar',['WACC −2%','WACC −1%','WACC','WACC +1%','WACC +2%'],[{
+    label:'Sum of Discounted FCF (USD)',
+    data:DCF.sumByCF,
+    backgroundColor:DCF.sumByCF.map((v,i)=>i===2?'rgba(0,229,195,0.8)':'rgba(124,158,248,0.6)'),
+    borderRadius:4,datalabels:DL_M
+  }],{plugins:cD.plugins,scales:{x:cD.scales.x,y:{...cD.scales.y,ticks:{color:'#5a6e84',callback:v=>'$'+(v/1e6).toFixed(1)+'M'}}}});
+
+  const t=document.getElementById('tbl-dcf');
+  const dcfRows=[
+    ['NOPLAT',DCF.noplat],
+    ['D&A Add-back',DCF.da],
+    ['Δ Working Capital',DCF.wc],
+    ['Investments',DCF.invest],
+    ['FCFF',DCF.fcff],
+    ['Discount Factor',DCF.discFactor],
+    ['Discounted FCFF',DCF.discFcff],
+  ];
+  t.innerHTML=`<thead><tr><th>Item</th>${years.map(y=>`<th>${y}</th>`).join('')}</tr></thead><tbody>
+  ${dcfRows.map(([lbl,vals])=>{
+    const isKey=lbl==='FCFF'||lbl==='Discounted FCFF';
+    const isDfact=lbl==='Discount Factor';
+    return`<tr class="${isKey?'total-row':''}"><td>${lbl}</td>${vals.map(v=>{
+      if(isDfact)return`<td>${v.toFixed(4)}</td>`;
+      return`<td class="${v<0?'neg':''}">${fmt(v)}</td>`;
+    }).join('')}</tr>`;
+  }).join('')}
+  <tr class="total-row"><td colspan="${years.length+1}" style="text-align:left;padding-top:12px">
+    <span style="margin-right:32px">Sum Discounted FCFF: <strong style="color:var(--accent)">$${(DCF.sumDcff/1e6).toFixed(1)}M</strong></span>
+    <span style="margin-right:32px">Terminal Value (g=2%): <strong style="color:var(--accent2)">$${(DCF.tvBase/1e6).toFixed(1)}M</strong></span>
+    <span style="margin-right:32px">Entity Value: <strong style="color:var(--accent)">$${(DCF.entityVal/1e6).toFixed(1)}M</strong></span>
+    <span>Equity Value: <strong style="color:var(--accent2)">$${(DCF.equityVal/1e6).toFixed(1)}M</strong></span>
+  </td></tr>
+  </tbody>`;
+}
+
+// ============================
+// TABS
+// ============================
+const rendered={};
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+  if(!rendered[tab]){
+    rendered[tab]=true;
+    if(tab==='overview')renderOverview();
+    if(tab==='costs')renderCosts();
+    if(tab==='margins')renderMargins();
+    if(tab==='ramp')renderRamp();
+    if(tab==='population')renderPopulation();
+    if(tab==='cashflow')renderCashflow();
+    if(tab==='dcf')renderDCF();
+  }
+}
+// ============================
+// PDF EXPORT
+// ============================
+async function downloadPDF() {
+  const btn = document.getElementById('pdf-btn');
+  const overlay = document.getElementById('pdf-overlay');
+  const statusEl = document.getElementById('pdf-status');
+  const barEl = document.getElementById('pdf-bar');
+
+  btn.disabled = true;
+  overlay.classList.add('visible');
+
+  const tabOrder = ['afs','revenue','costs','margins','ramp','population','cashflow','dcf'];
+  const tabLabels = {
+    afs:'AFS Overview', revenue:'Revenue Breakdown', costs:'Cost Structure',
+    margins:'Margins & Profitability', ramp:'Country Ramp-Up',
+    population:'Population & Rev/Pop', cashflow:'Cash Flow', dcf:'DCF & Valuation'
+  };
+  const renderFns = {
+    afs:renderAFS, revenue:renderRevenue, costs:renderCosts,
+    margins:renderMargins, ramp:renderRamp, population:renderPopulation,
+    cashflow:renderCashflow, dcf:renderDCF
+  };
+
+  // Step 1 — Force-render every panel so all charts exist in the DOM
+  statusEl.textContent = 'Rendering all panels…';
+  barEl.style.width = '5%';
+
+  const savedScroll = window.scrollY;
+
+  for (const tab of tabOrder) {
+    if (!rendered[tab]) {
+      const panel = document.getElementById('panel-' + tab);
+      panel.style.cssText = 'display:block!important;position:fixed!important;top:0!important;left:-9999px!important;width:1440px!important;z-index:-1!important;background:#f0f2f6!important';
+      renderFns[tab]();
+      rendered[tab] = true;
+    }
+  }
+
+  // Let Chart.js finish drawing all canvases
+  await new Promise(r => setTimeout(r, 1200));
+
+  // Clean up forced-display overrides
+  for (const tab of tabOrder) {
+    const panel = document.getElementById('panel-' + tab);
+    panel.style.cssText = '';
+    if (!panel.classList.contains('active')) panel.style.display = '';
+  }
+
+  barEl.style.width = '12%';
+
+  // Step 2 — PDF setup
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  const PW = pdf.internal.pageSize.getWidth();   // 297mm
+  const PH = pdf.internal.pageSize.getHeight();  // 210mm
+
+  // Margins & usable area
+  const MX = 8, MY_TOP = 6, MY_BOT = 10;
+  const useW = PW - MX * 2;       // 281mm usable width
+  const useH = PH - MY_TOP - MY_BOT; // 194mm usable content height
+
+  // Capture settings — scale:3 gives 3× pixel density so charts render crisply
+  const CAP_SCALE = 3;
+  const CAP_VIEWPORT = 1480; // wide enough for 2-col grids to breathe
+
+  let firstPage = true;
+
+  for (let ti = 0; ti < tabOrder.length; ti++) {
+    const tab = tabOrder[ti];
+    statusEl.textContent = `Capturing: ${tabLabels[tab]}…`;
+    barEl.style.width = (12 + ((ti + 1) / tabOrder.length) * 82) + '%';
+
+    const panel = document.getElementById('panel-' + tab);
+
+    // Temporarily show panel for capture
+    const wasActive = panel.classList.contains('active');
+    panel.style.display = 'block';
+
+    let canvas;
+    try {
+      canvas = await html2canvas(panel, {
+        scale: CAP_SCALE,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#f0f2f6',
+        windowWidth: CAP_VIEWPORT,
+        scrollX: 0,
+        scrollY: 0,
+        ignoreElements: el => el.id === 'pdf-overlay'
+      });
+    } catch(e) {
+      console.warn('html2canvas error:', tab, e);
+      if (!wasActive) panel.style.display = '';
+      continue;
+    }
+
+    if (!wasActive) panel.style.display = '';
+
+    // --- mm per source pixel (fit width to usable area) ---
+    const mmPerPx = useW / canvas.width;
+
+    // How many source pixels fit in one usable content slice (leave room for footer)
+    const pxPerSlice = Math.floor(useH / mmPerPx);
+    const numSlices = Math.ceil(canvas.height / pxPerSlice);
+
+    for (let p = 0; p < numSlices; p++) {
+      if (!firstPage || p > 0) pdf.addPage();
+      firstPage = false;
+
+      // Dark page background
+      pdf.setFillColor(240, 242, 246);
+      pdf.rect(0, 0, PW, PH, 'F');
+
+      const srcY = p * pxPerSlice;
+      const srcH = Math.min(pxPerSlice, canvas.height - srcY);
+
+      // Slice
+      const slice = document.createElement('canvas');
+      slice.width = canvas.width;
+      slice.height = srcH;
+      const ctx = slice.getContext('2d');
+      ctx.fillStyle = '#f0f2f6';
+      ctx.fillRect(0, 0, slice.width, slice.height);
+      ctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+
+      const sliceImg = slice.toDataURL('image/jpeg', 0.94);
+      const sliceH_mm = srcH * mmPerPx;
+
+      pdf.addImage(sliceImg, 'JPEG', MX, MY_TOP, useW, sliceH_mm);
+
+      // Footer bar
+      pdf.setFillColor(225, 229, 237);
+      pdf.rect(0, PH - MY_BOT + 1, PW, MY_BOT, 'F');
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(7);
+      pdf.setTextColor(80, 100, 120);
+      const pageLabel = numSlices > 1 ? `${tabLabels[tab]}  (${p+1}/${numSlices})` : tabLabels[tab];
+      pdf.text(pageLabel, MX, PH - 2.5);
+      pdf.text('OmniTrust · 17 Countries · Scenario 3 Baseline · From Jan 1 2027', PW - MX, PH - 2.5, { align: 'right' });
+    }
+  }
+
+  barEl.style.width = '100%';
+  statusEl.textContent = 'Saving…';
+  await new Promise(r => setTimeout(r, 150));
+
+  pdf.save('OmniTrust_S3_Baseline_From_Jan2027.pdf');
+
+  overlay.classList.remove('visible');
+  btn.disabled = false;
+  barEl.style.width = '0%';
+  window.scrollTo(0, savedScroll);
+}
+
+renderRamp();rendered['ramp']=true;
+</script>
+</body>
+</html>
