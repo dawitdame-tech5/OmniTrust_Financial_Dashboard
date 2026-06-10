@@ -9,118 +9,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap');
-  :root {
-    --bg:#f0f2f5;--surface:#ffffff;--surface2:#f5f6f8;--border:#dde0e8;
-    --accent:#F26522;--accent2:#006767;--accent3:#E30613;--accent4:#1B3A6A;
-    --text:#3C3C3B;--muted:#5a6874;--green:#008D36;--red:#E30613;
-    --t5-orange:#F26522;--t5-navy:#1B3A6A;--t5-teal:#006767;--t5-dark:#003148;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-  header{padding:28px 40px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#ffffff 0%,#f5f6f8 100%);border-left:4px solid var(--t5-orange)}
-  .logo{font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;letter-spacing:-0.5px;color:var(--t5-navy)}
-  .logo .omni{color:var(--t5-orange);font-style:italic}
-  .logo .divider-brand{width:1px;height:28px;background:#dde0e8;margin:0 14px;display:inline-block;vertical-align:middle}
-  .logo .t5-brand{font-size:11px;font-weight:600;color:var(--t5-teal);letter-spacing:1px;text-transform:uppercase;vertical-align:middle}
-  .header-meta{display:flex;gap:24px;align-items:center}
-  .badge{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase}
-  .badge.active{color:var(--accent);border-color:var(--accent);background:rgba(242,101,34,0.08)}
-  .tabs{display:flex;gap:0;padding:0 40px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto}
-  .tab{padding:14px 20px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.15s;letter-spacing:0.2px}
-  .tab:hover{color:var(--text)}
-  .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-  main{padding:32px 40px;max-width:1600px}
-  .panel{display:none}.panel.active{display:block}
-  .kpi-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px}
-  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
-  .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--t5-orange),transparent)}
-  .kpi.red::before{background:linear-gradient(90deg,var(--t5-orange),transparent)}
-  .kpi.yellow::before{background:linear-gradient(90deg,var(--t5-navy),transparent)}
-  .kpi.blue::before{background:linear-gradient(90deg,var(--t5-teal),transparent)}
-  .kpi-label{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px}
-  .kpi-value{font-family:'DM Serif Display',serif;font-size:28px;color:var(--text);line-height:1;margin-bottom:4px}
-  .kpi-sub{font-size:11px;color:var(--muted)}
-  .kpi-sub.up{color:var(--green)}.kpi-sub.down{color:var(--red)}
-  .section-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);margin-bottom:16px;margin-top:8px;display:flex;align-items:center;gap:10px}
-  .section-title .line{flex:1;height:1px;background:linear-gradient(90deg,var(--t5-orange),transparent)}
-  .chart-grid{display:grid;gap:20px;margin-bottom:28px}
-  .chart-grid.cols2{grid-template-columns:1fr 1fr}
-  .chart-grid.cols3{grid-template-columns:1fr 1fr 1fr}
-  .chart-grid.cols21{grid-template-columns:2fr 1fr}
-  .chart-grid.cols12{grid-template-columns:1fr 2fr}
-  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;position:relative;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
-  .chart-card-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:4px;font-family:'DM Mono',monospace}
-  .chart-card-sub{font-size:11px;color:var(--muted);margin-bottom:16px;opacity:0.7}
-  canvas{max-height:360px}
-  .data-table{width:100%;border-collapse:collapse;font-size:13px}
-  .data-table th{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);padding:8px 12px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
-  .data-table th:first-child{text-align:left}
-  .data-table td{padding:8px 12px;text-align:right;border-bottom:1px solid rgba(0,0,0,0.04);font-family:'DM Mono',monospace;font-size:12px;white-space:nowrap}
-  .data-table td:first-child{text-align:left;font-family:'Instrument Sans',sans-serif;font-size:13px}
-  .data-table tr:hover td{background:rgba(0,0,0,0.025)}
-  .data-table .total-row td{color:var(--accent);font-weight:500;border-top:1px solid var(--border)}
-  .data-table .neg{color:var(--red)}.data-table .pos{color:var(--green)}
-  .table-wrapper{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
-  .table-inner{min-width:900px;padding:0}
-  .ramp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:28px}
-  .country-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;transition:border-color 0.15s;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
-  .country-card:hover{border-color:var(--accent)}
-  .country-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
-  .country-type{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;letter-spacing:0.5px}
-  .country-turn-on{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2);margin-bottom:6px}
-  .country-pop{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
-  .ramp-bar{height:3px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden}
-  .ramp-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent4));border-radius:2px}
-  .legend-strip{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap}
-  .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
-  .legend-dot{width:8px;height:8px;border-radius:50%}
-  .pop-callout{background:linear-gradient(135deg,rgba(74,110,224,0.07),rgba(0,168,150,0.04));border:1px solid rgba(74,110,224,0.18);border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;gap:40px;flex-wrap:wrap}
-  .pop-stat-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
-  .pop-stat-val{font-family:'DM Serif Display',serif;font-size:24px;color:var(--accent4)}
-  /* DCF STYLES */
-  .dcf-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px}
-  .valuation-box{background:linear-gradient(135deg,rgba(0,168,150,0.07),rgba(74,110,224,0.04));border:1px solid rgba(0,168,150,0.3);border-radius:10px;padding:24px;text-align:center}
-  .valuation-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px}
-  .valuation-val{font-family:'DM Serif Display',serif;font-size:42px;color:var(--accent);line-height:1}
-  .valuation-sub{font-size:12px;color:var(--muted);margin-top:6px}
-  .sensitivity-table{width:100%;border-collapse:collapse;font-size:11px}
-  .sensitivity-table th{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);padding:6px 10px;text-align:center;border-bottom:1px solid var(--border);white-space:nowrap}
-  .sensitivity-table td{font-family:'DM Mono',monospace;font-size:11px;padding:6px 10px;text-align:center;border-bottom:1px solid rgba(0,0,0,0.04)}
-  .sensitivity-table .highlight{color:var(--accent);font-weight:500}
-  .wacc-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-  .wacc-chip{background:#ffffff;border:1px solid #dde2eb;box-shadow:0 1px 3px rgba(0,0,0,0.05);border-radius:6px;padding:8px 14px;text-align:center;flex:1;min-width:100px}
-  .wacc-chip-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
-  .wacc-chip-val{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent2)}
-  .pdf-btn{display:flex;align-items:center;gap:8px;padding:8px 18px;background:linear-gradient(135deg,rgba(0,229,195,0.15),rgba(124,158,248,0.1));border:1px solid rgba(0,229,195,0.4);border-radius:7px;color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;font-weight:500;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
-  .pdf-btn:hover{background:linear-gradient(135deg,rgba(0,229,195,0.25),rgba(124,158,248,0.15));border-color:var(--accent);box-shadow:0 0 12px rgba(0,229,195,0.2)}
-  .pdf-btn:disabled{opacity:0.5;cursor:not-allowed}
-  .pdf-btn svg{width:14px;height:14px;flex-shrink:0}
-  .pdf-overlay{display:none;position:fixed;inset:0;background:rgba(240,242,246,0.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px;backdrop-filter:blur(4px)}
-  .pdf-overlay.visible{display:flex}
-  .pdf-overlay-title{font-family:'DM Serif Display',serif;font-size:22px;color:#1a2433}
-  .pdf-overlay-sub{font-family:'DM Mono',monospace;font-size:12px;color:#5a6e84;letter-spacing:0.5px}
-  .pdf-progress{width:280px;height:3px;background:#dde2eb;border-radius:2px;overflow:hidden}
-  .pdf-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent4));border-radius:2px;transition:width 0.3s ease}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .pdf-spinner{width:32px;height:32px;border:2px solid #dde2eb;border-top-color:#00a896;border-radius:50%;animation:spin 0.8s linear infinite}
-    header{padding:16px 20px}main{padding:20px}.tabs{padding:0 20px}
-    .chart-grid.cols2,.chart-grid.cols3,.chart-grid.cols21,.chart-grid.cols12,.dcf-grid{grid-template-columns:1fr}
-  }
 
-  /* ── Scenario segmented control ────────────────────────────── */
-  .scen-seg{display:flex;background:var(--surface2);border:1px solid var(--border);
-    border-radius:8px;padding:3px;gap:2px;box-shadow:inset 0 1px 2px rgba(0,0,0,0.04)}
-  .scen-seg-btn{padding:5px 16px;font-family:'DM Mono',monospace;font-size:11px;
-    font-weight:500;letter-spacing:0.4px;cursor:pointer;border:none;
-    background:transparent;color:var(--muted);border-radius:5px;
-    transition:all 0.15s;white-space:nowrap;line-height:1.4}
-  .scen-seg-btn:hover:not(.active){background:var(--surface);color:var(--text)}
-  .scen-seg-btn.active{background:var(--text);color:#fff;
-    box-shadow:0 1px 3px rgba(0,0,0,0.15)}
-  .scen-seg-btn.active.conservative{background:#1B3A6A}
-</style>
 </head>
 <body>
 <header>
@@ -693,11 +582,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OmniTrust · TECH5-SA — Financial Dashboard · S3 Baseline · From Jan 1 2027</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+
+
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap');
   :root {
@@ -2235,6 +2124,30 @@ function switchTab(tab){
 // ============================
 // PDF EXPORT
 // ============================
+// Converts a D3 SVG element to a canvas so html2canvas can capture it
+async function svgToCanvas(svgEl) {
+  return new Promise(resolve => {
+    const box = svgEl.getBoundingClientRect();
+    const w = svgEl.getAttribute('width') || box.width || 600;
+    const h = svgEl.getAttribute('height') || box.height || 300;
+    const xml = new XMLSerializer().serializeToString(svgEl);
+    const svgBlob = new Blob([xml], {type:'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = w * 2; cv.height = h * 2;
+      const ctx = cv.getContext('2d');
+      ctx.scale(2,2);
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      resolve(cv);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+
 async function downloadPDF() {
   const btn = document.getElementById('pdf-btn');
   const overlay = document.getElementById('pdf-overlay');
@@ -2244,70 +2157,88 @@ async function downloadPDF() {
   btn.disabled = true;
   overlay.classList.add('visible');
 
-  const tabOrder = ['afs','revenue','costs','margins','ramp','population','cashflow','dcf'];
-  const tabLabels = {
-    afs:'AFS Overview', revenue:'Revenue Breakdown', costs:'Cost Structure',
-    margins:'Margins & Profitability', ramp:'Country Ramp-Up',
-    population:'Population & Rev/Pop', cashflow:'Cash Flow', dcf:'DCF & Valuation'
+  const tabOrder   = ['overview','costs','margins','ramp','population','cashflow','dcf'];
+  const tabLabels  = {
+    overview:'Revenue & P&L', costs:'Cost Structure', margins:'Margins & Profitability',
+    ramp:'Country Ramp-Up', population:'Population & Rev/Pop',
+    cashflow:'Cash Flow', dcf:'DCF & Valuation'
   };
-  const renderFns = {
-    afs:renderAFS, revenue:renderRevenue, costs:renderCosts,
-    margins:renderMargins, ramp:renderRamp, population:renderPopulation,
-    cashflow:renderCashflow, dcf:renderDCF
+  const renderFns  = {
+    overview:renderOverview, costs:renderCosts, margins:renderMargins,
+    ramp:renderRamp, population:renderPopulation, cashflow:renderCashflow, dcf:renderDCF
   };
 
-  // Step 1 — Force-render every panel so all charts exist in the DOM
-  statusEl.textContent = 'Rendering all panels…';
+  // ── Step 1: Force-render all panels off-screen ───────────────────────
+  statusEl.textContent = 'Rendering panels…';
   barEl.style.width = '5%';
-
   const savedScroll = window.scrollY;
 
   for (const tab of tabOrder) {
     if (!rendered[tab]) {
       const panel = document.getElementById('panel-' + tab);
+      if (!panel) continue;
       panel.style.cssText = 'display:block!important;position:fixed!important;top:0!important;left:-9999px!important;width:1440px!important;z-index:-1!important;background:#f0f2f6!important';
-      renderFns[tab]();
-      rendered[tab] = true;
+      try { renderFns[tab](); rendered[tab] = true; } catch(e) { console.warn('render err',tab,e); }
     }
   }
 
-  // Let Chart.js finish drawing all canvases
-  await new Promise(r => setTimeout(r, 1200));
+  // Wait for Chart.js AND D3 treemaps to finish drawing
+  await new Promise(r => setTimeout(r, 2000));
 
-  // Clean up forced-display overrides
+  // ── Step 2: Pre-render all D3 SVGs → canvas replacements ─────────────
+  statusEl.textContent = 'Processing charts…';
+  barEl.style.width = '10%';
+
+  // For each panel, replace SVG treemap elements with canvas equivalents
+  const svgReplacements = []; // track so we can restore later
   for (const tab of tabOrder) {
     const panel = document.getElementById('panel-' + tab);
+    if (!panel) continue;
+    const svgs = panel.querySelectorAll('svg');
+    for (const svg of svgs) {
+      const parent = svg.parentElement;
+      const cv = await svgToCanvas(svg);
+      if (cv) {
+        cv.style.cssText = svg.style.cssText || '';
+        cv.style.width = '100%';
+        cv.style.maxWidth = (svg.getAttribute('width') || 600) + 'px';
+        parent.insertBefore(cv, svg);
+        svg.style.display = 'none';
+        svgReplacements.push({svg, cv, parent});
+      }
+    }
+  }
+
+  // Restore panels to normal flow
+  for (const tab of tabOrder) {
+    const panel = document.getElementById('panel-' + tab);
+    if (!panel) continue;
     panel.style.cssText = '';
     if (!panel.classList.contains('active')) panel.style.display = '';
   }
 
-  barEl.style.width = '12%';
+  barEl.style.width = '15%';
 
-  // Step 2 — PDF setup
+  // ── Step 3: Build PDF ─────────────────────────────────────────────────
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  const pdf = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
   const PW = pdf.internal.pageSize.getWidth();   // 297mm
   const PH = pdf.internal.pageSize.getHeight();  // 210mm
-
-  // Margins & usable area
   const MX = 8, MY_TOP = 6, MY_BOT = 10;
-  const useW = PW - MX * 2;       // 281mm usable width
-  const useH = PH - MY_TOP - MY_BOT; // 194mm usable content height
-
-  // Capture settings — scale:3 gives 3× pixel density so charts render crisply
-  const CAP_SCALE = 3;
-  const CAP_VIEWPORT = 1480; // wide enough for 2-col grids to breathe
-
+  const useW = PW - MX * 2;
+  const useH = PH - MY_TOP - MY_BOT;
+  const CAP_SCALE = 2;
+  const CAP_VIEWPORT = 1480;
   let firstPage = true;
 
   for (let ti = 0; ti < tabOrder.length; ti++) {
     const tab = tabOrder[ti];
     statusEl.textContent = `Capturing: ${tabLabels[tab]}…`;
-    barEl.style.width = (12 + ((ti + 1) / tabOrder.length) * 82) + '%';
+    barEl.style.width = (15 + ((ti + 1) / tabOrder.length) * 78) + '%';
 
     const panel = document.getElementById('panel-' + tab);
+    if (!panel) continue;
 
-    // Temporarily show panel for capture
     const wasActive = panel.classList.contains('active');
     panel.style.display = 'block';
 
@@ -2316,25 +2247,21 @@ async function downloadPDF() {
       canvas = await html2canvas(panel, {
         scale: CAP_SCALE,
         useCORS: true,
+        allowTaint: true,
         logging: false,
         backgroundColor: '#f0f2f6',
         windowWidth: CAP_VIEWPORT,
-        scrollX: 0,
-        scrollY: 0,
-        ignoreElements: el => el.id === 'pdf-overlay'
+        scrollX: 0, scrollY: 0,
+        ignoreElements: el => el.id === 'pdf-overlay' || el.classList.contains('pdf-btn')
       });
     } catch(e) {
       console.warn('html2canvas error:', tab, e);
       if (!wasActive) panel.style.display = '';
       continue;
     }
-
     if (!wasActive) panel.style.display = '';
 
-    // --- mm per source pixel (fit width to usable area) ---
     const mmPerPx = useW / canvas.width;
-
-    // How many source pixels fit in one usable content slice (leave room for footer)
     const pxPerSlice = Math.floor(useH / mmPerPx);
     const numSlices = Math.ceil(canvas.height / pxPerSlice);
 
@@ -2342,44 +2269,43 @@ async function downloadPDF() {
       if (!firstPage || p > 0) pdf.addPage();
       firstPage = false;
 
-      // Dark page background
       pdf.setFillColor(240, 242, 246);
       pdf.rect(0, 0, PW, PH, 'F');
 
       const srcY = p * pxPerSlice;
       const srcH = Math.min(pxPerSlice, canvas.height - srcY);
 
-      // Slice
       const slice = document.createElement('canvas');
-      slice.width = canvas.width;
-      slice.height = srcH;
+      slice.width = canvas.width; slice.height = srcH;
       const ctx = slice.getContext('2d');
       ctx.fillStyle = '#f0f2f6';
       ctx.fillRect(0, 0, slice.width, slice.height);
       ctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
 
-      const sliceImg = slice.toDataURL('image/jpeg', 0.94);
-      const sliceH_mm = srcH * mmPerPx;
+      pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', MX, MY_TOP, useW, srcH * mmPerPx);
 
-      pdf.addImage(sliceImg, 'JPEG', MX, MY_TOP, useW, sliceH_mm);
-
-      // Footer bar
+      // Footer
       pdf.setFillColor(225, 229, 237);
       pdf.rect(0, PH - MY_BOT + 1, PW, MY_BOT, 'F');
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(7);
-      pdf.setTextColor(80, 100, 120);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(80,100,120);
       const pageLabel = numSlices > 1 ? `${tabLabels[tab]}  (${p+1}/${numSlices})` : tabLabels[tab];
       pdf.text(pageLabel, MX, PH - 2.5);
-      pdf.text(`OmniTrust · ${SCENARIOS[activeScenario].countries} Countries · ${SCENARIOS[activeScenario].label} · From Jan 1 2027`, PW - MX, PH - 2.5, { align: 'right' });
+      pdf.text(`OmniTrust · ${SCENARIOS[activeScenario].countries} Countries · ${SCENARIOS[activeScenario].label} · From Jan 1 2027`, PW - MX, PH - 2.5, {align:'right'});
     }
+  }
+
+  // ── Step 4: Restore SVG elements ──────────────────────────────────────
+  for (const {svg, cv, parent} of svgReplacements) {
+    svg.style.display = '';
+    try { parent.removeChild(cv); } catch(_){}
   }
 
   barEl.style.width = '100%';
   statusEl.textContent = 'Saving…';
   await new Promise(r => setTimeout(r, 150));
 
-  pdf.save('OmniTrust_S3_Baseline_From_Jan2027.pdf');
+  const scen = activeScenario === 'conservative' ? 'S1_Conservative' : 'S3_Baseline';
+  pdf.save(`OmniTrust_${scen}_From_Jan2027.pdf`);
 
   overlay.classList.remove('visible');
   btn.disabled = false;
