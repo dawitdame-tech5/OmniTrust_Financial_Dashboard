@@ -17,8 +17,7 @@
   <div class="header-meta">
     <div class="badge" id="hdr-countries-badge">17 Countries</div>
     <div class="scen-seg">
-      <button class="scen-seg-btn active" id="btn-baseline" onclick="setScenario('baseline')">S3 · Baseline</button>
-      <button class="scen-seg-btn" id="btn-conservative" onclick="setScenario('conservative')">S1 · Conservative</button>
+      <button class="scen-seg-btn active" id="btn-baseline" onclick="setScenario('baseline')">S3 · Baseline</button><span class="scen-seg-sep"></span><button class="scen-seg-btn" id="btn-conservative" onclick="setScenario('conservative')">S1 · Conservative</button>
     </div>
     <div class="badge">FY2027–2031</div>
     <button class="pdf-btn" id="pdf-btn" onclick="downloadPDF()">
@@ -400,6 +399,16 @@
   margin: 0;
   max-width: 100%;
 }
+
+  /* ── Scenario toggle — badge-matched style ─────────────────────────── */
+  .scen-seg{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+  .scen-seg-sep{width:1px;background:var(--border);flex-shrink:0}
+  .scen-seg-btn{padding:5px 14px;font-family:'DM Mono',monospace;font-size:11px;font-weight:400;
+    letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;
+    color:var(--muted);transition:color 0.15s,background 0.15s;white-space:nowrap;line-height:1.4}
+  .scen-seg-btn:hover:not(.active){color:var(--text);background:rgba(0,0,0,0.025)}
+  .scen-seg-btn.active{color:var(--accent);background:rgba(242,101,34,0.07)}
+  .scen-seg-btn.active.conservative{color:var(--t5-navy,#1B3A6A);background:rgba(27,58,106,0.07)}
 </style>
 <div class="slide">
 
