@@ -2133,51 +2133,62 @@ function switchTab(tab){
 // ============================
 // PDF EXPORT
 // ============================
-// Converts a D3 SVG element to a canvas so html2canvas can capture it
-async function svgToCanvas(svgEl) {
+
+// Robust SVG → canvas: works off-screen, uses data URL not blob
+function svgToCanvas(svgEl, w, h) {
   return new Promise(resolve => {
-    const box = svgEl.getBoundingClientRect();
-    const w = svgEl.getAttribute('width') || box.width || 600;
-    const h = svgEl.getAttribute('height') || box.height || 300;
-    const xml = new XMLSerializer().serializeToString(svgEl);
-    const svgBlob = new Blob([xml], {type:'image/svg+xml;charset=utf-8'});
-    const url = URL.createObjectURL(svgBlob);
+    const clone = svgEl.cloneNode(true);
+    clone.setAttribute('width', w);
+    clone.setAttribute('height', h);
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    // Replace web fonts with safe generic (not embedded in serialised SVG)
+    clone.querySelectorAll('text,[font-family]').forEach(el => {
+      el.setAttribute('font-family', 'monospace');
+      el.style && (el.style.fontFamily = 'monospace');
+    });
+    let xml;
+    try { xml = new XMLSerializer().serializeToString(clone); }
+    catch(e) { return resolve(null); }
+    const b64 = btoa(unescape(encodeURIComponent(xml)));
+    const dataUrl = 'data:image/svg+xml;base64,' + b64;
+    const cv = document.createElement('canvas');
+    cv.width = w * 2; cv.height = h * 2;
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#f0f2f6';
+    ctx.fillRect(0, 0, cv.width, cv.height);
     const img = new Image();
+    const timer = setTimeout(() => resolve(cv), 3000); // timeout fallback
     img.onload = () => {
-      const cv = document.createElement('canvas');
-      cv.width = w * 2; cv.height = h * 2;
-      const ctx = cv.getContext('2d');
-      ctx.scale(2,2);
+      clearTimeout(timer);
+      ctx.scale(2, 2);
       ctx.drawImage(img, 0, 0, w, h);
-      URL.revokeObjectURL(url);
       resolve(cv);
     };
-    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
-    img.src = url;
+    img.onerror = () => { clearTimeout(timer); resolve(cv); }; // return blank canvas on error
+    img.src = dataUrl;
   });
 }
 
 async function downloadPDF() {
-  const btn = document.getElementById('pdf-btn');
+  const btn     = document.getElementById('pdf-btn');
   const overlay = document.getElementById('pdf-overlay');
-  const statusEl = document.getElementById('pdf-status');
-  const barEl = document.getElementById('pdf-bar');
-
+  const statusEl= document.getElementById('pdf-status');
+  const barEl   = document.getElementById('pdf-bar');
   btn.disabled = true;
   overlay.classList.add('visible');
 
-  const tabOrder   = ['overview','costs','margins','ramp','population','cashflow','dcf'];
-  const tabLabels  = {
+  const tabOrder  = ['overview','costs','margins','ramp','population','cashflow','dcf'];
+  const tabLabels = {
     overview:'Revenue & P&L', costs:'Cost Structure', margins:'Margins & Profitability',
     ramp:'Country Ramp-Up', population:'Population & Rev/Pop',
     cashflow:'Cash Flow', dcf:'DCF & Valuation'
   };
-  const renderFns  = {
+  const renderFns = {
     overview:renderOverview, costs:renderCosts, margins:renderMargins,
     ramp:renderRamp, population:renderPopulation, cashflow:renderCashflow, dcf:renderDCF
   };
 
-  // ── Step 1: Force-render all panels off-screen ───────────────────────
+  // ── Step 1: Force-render all panels off-screen so every chart exists ──
   statusEl.textContent = 'Rendering panels…';
   barEl.style.width = '5%';
   const savedScroll = window.scrollY;
@@ -2187,70 +2198,73 @@ async function downloadPDF() {
       const panel = document.getElementById('panel-' + tab);
       if (!panel) continue;
       panel.style.cssText = 'display:block!important;position:fixed!important;top:0!important;left:-9999px!important;width:1440px!important;z-index:-1!important;background:#f0f2f6!important';
-      try { renderFns[tab](); rendered[tab] = true; } catch(e) { console.warn('render err',tab,e); }
+      try { renderFns[tab](); rendered[tab] = true; } catch(e) { console.warn('render err', tab, e); }
     }
   }
 
-  // Wait for Chart.js AND D3 treemaps to finish drawing
-  await new Promise(r => setTimeout(r, 2000));
+  // Wait for Chart.js + D3 to finish
+  await new Promise(r => setTimeout(r, 2500));
 
-  // ── Step 2: Pre-render all D3 SVGs → canvas replacements ─────────────
-  statusEl.textContent = 'Processing charts…';
-  barEl.style.width = '10%';
-
-  // For each panel, replace SVG treemap elements with canvas equivalents
-  const svgReplacements = []; // track so we can restore later
-  for (const tab of tabOrder) {
-    const panel = document.getElementById('panel-' + tab);
-    if (!panel) continue;
-    const svgs = panel.querySelectorAll('svg');
-    for (const svg of svgs) {
-      const parent = svg.parentElement;
-      const cv = await svgToCanvas(svg);
-      if (cv) {
-        cv.style.cssText = svg.style.cssText || '';
-        cv.style.width = '100%';
-        cv.style.maxWidth = (svg.getAttribute('width') || 600) + 'px';
-        parent.insertBefore(cv, svg);
-        svg.style.display = 'none';
-        svgReplacements.push({svg, cv, parent});
-      }
-    }
-  }
-
-  // Restore panels to normal flow
+  // Restore all panels to their normal hidden state
   for (const tab of tabOrder) {
     const panel = document.getElementById('panel-' + tab);
     if (!panel) continue;
     panel.style.cssText = '';
-    if (!panel.classList.contains('active')) panel.style.display = '';
+    if (!panel.classList.contains('active')) panel.style.display = 'none';
   }
 
-  barEl.style.width = '15%';
+  barEl.style.width = '10%';
 
-  // ── Step 3: Build PDF ─────────────────────────────────────────────────
+  // ── PDF setup ─────────────────────────────────────────────────────────
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
-  const PW = pdf.internal.pageSize.getWidth();   // 297mm
-  const PH = pdf.internal.pageSize.getHeight();  // 210mm
+  const PW = pdf.internal.pageSize.getWidth();
+  const PH = pdf.internal.pageSize.getHeight();
   const MX = 8, MY_TOP = 6, MY_BOT = 10;
   const useW = PW - MX * 2;
   const useH = PH - MY_TOP - MY_BOT;
   const CAP_SCALE = 2;
-  const CAP_VIEWPORT = 1480;
   let firstPage = true;
 
   for (let ti = 0; ti < tabOrder.length; ti++) {
     const tab = tabOrder[ti];
     statusEl.textContent = `Capturing: ${tabLabels[tab]}…`;
-    barEl.style.width = (15 + ((ti + 1) / tabOrder.length) * 78) + '%';
+    barEl.style.width = (10 + ((ti + 1) / tabOrder.length) * 83) + '%';
 
     const panel = document.getElementById('panel-' + tab);
     if (!panel) continue;
 
-    const wasActive = panel.classList.contains('active');
+    // Show panel in normal flow so dimensions are correct
     panel.style.display = 'block';
+    await new Promise(r => setTimeout(r, 80)); // brief reflow
 
+    // ── Convert all D3 SVGs in this panel to canvas overlays ────────────
+    const svgSwaps = [];
+    panel.querySelectorAll('svg').forEach(svg => {
+      const container = svg.parentElement;
+      if (!container) return;
+      // Get actual rendered dimensions from the container div
+      const w = container.offsetWidth  || parseInt(container.style.width)  || 600;
+      const h = container.offsetHeight || parseInt(container.style.height) || 300;
+      if (w < 10 || h < 10) return; // skip if not visible
+      svgSwaps.push({ svg, container, w, h });
+    });
+
+    // Build replacement canvases
+    const replacements = [];
+    for (const { svg, container, w, h } of svgSwaps) {
+      const cv = await svgToCanvas(svg, w, h);
+      if (!cv) continue;
+      cv.style.cssText = `width:${w}px;height:${h}px;display:block`;
+      container.insertBefore(cv, svg);
+      svg.style.visibility = 'hidden';  // hide but keep layout intact
+      replacements.push({ svg, cv });
+    }
+
+    // Small wait for canvas insertions to settle
+    if (replacements.length > 0) await new Promise(r => setTimeout(r, 100));
+
+    // ── Capture ──────────────────────────────────────────────────────────
     let canvas;
     try {
       canvas = await html2canvas(panel, {
@@ -2259,33 +2273,42 @@ async function downloadPDF() {
         allowTaint: true,
         logging: false,
         backgroundColor: '#f0f2f6',
-        windowWidth: CAP_VIEWPORT,
+        windowWidth: 1480,
         scrollX: 0, scrollY: 0,
         ignoreElements: el => el.id === 'pdf-overlay' || el.classList.contains('pdf-btn')
       });
     } catch(e) {
-      console.warn('html2canvas error:', tab, e);
-      if (!wasActive) panel.style.display = '';
-      continue;
+      console.warn('html2canvas err:', tab, e);
     }
-    if (!wasActive) panel.style.display = '';
 
-    const mmPerPx = useW / canvas.width;
+    // ── Restore SVGs ─────────────────────────────────────────────────────
+    for (const { svg, cv } of replacements) {
+      svg.style.visibility = '';
+      try { cv.parentElement && cv.parentElement.removeChild(cv); } catch(_) {}
+    }
+
+    // Hide panel again
+    panel.style.display = '';
+    if (!panel.classList.contains('active')) panel.style.display = 'none';
+
+    if (!canvas) continue;
+
+    // ── Slice canvas onto PDF pages ──────────────────────────────────────
+    const mmPerPx   = useW / canvas.width;
     const pxPerSlice = Math.floor(useH / mmPerPx);
-    const numSlices = Math.ceil(canvas.height / pxPerSlice);
+    const numSlices  = Math.ceil(canvas.height / pxPerSlice);
 
     for (let p = 0; p < numSlices; p++) {
       if (!firstPage || p > 0) pdf.addPage();
       firstPage = false;
-
       pdf.setFillColor(240, 242, 246);
       pdf.rect(0, 0, PW, PH, 'F');
 
       const srcY = p * pxPerSlice;
       const srcH = Math.min(pxPerSlice, canvas.height - srcY);
-
       const slice = document.createElement('canvas');
-      slice.width = canvas.width; slice.height = srcH;
+      slice.width  = canvas.width;
+      slice.height = srcH;
       const ctx = slice.getContext('2d');
       ctx.fillStyle = '#f0f2f6';
       ctx.fillRect(0, 0, slice.width, slice.height);
@@ -2293,21 +2316,17 @@ async function downloadPDF() {
 
       pdf.addImage(slice.toDataURL('image/jpeg', 0.92), 'JPEG', MX, MY_TOP, useW, srcH * mmPerPx);
 
-      // Footer
       pdf.setFillColor(225, 229, 237);
       pdf.rect(0, PH - MY_BOT + 1, PW, MY_BOT, 'F');
-      pdf.setFont('helvetica','normal'); pdf.setFontSize(7); pdf.setTextColor(80,100,120);
-      const pageLabel = numSlices > 1 ? `${tabLabels[tab]}  (${p+1}/${numSlices})` : tabLabels[tab];
-      pdf.text(pageLabel, MX, PH - 2.5);
-      pdf.text(`OmniTrust · ${SCENARIOS[activeScenario].countries} Countries · ${SCENARIOS[activeScenario].label} · From Jan 1 2027`, PW - MX, PH - 2.5, {align:'right'});
+      pdf.setFont('helvetica', 'normal'); pdf.setFontSize(7); pdf.setTextColor(80, 100, 120);
+      const lbl = numSlices > 1 ? `${tabLabels[tab]}  (${p+1}/${numSlices})` : tabLabels[tab];
+      pdf.text(lbl, MX, PH - 2.5);
+      pdf.text(`OmniTrust · ${SCENARIOS[activeScenario].countries} Countries · ${SCENARIOS[activeScenario].label} · From Jan 1 2027`, PW - MX, PH - 2.5, { align:'right' });
     }
   }
 
-  // ── Step 4: Restore SVG elements ──────────────────────────────────────
-  for (const {svg, cv, parent} of svgReplacements) {
-    svg.style.display = '';
-    try { parent.removeChild(cv); } catch(_){}
-  }
+  // Restore active panel visibility
+  document.querySelectorAll('.panel.active').forEach(p => { p.style.display = ''; });
 
   barEl.style.width = '100%';
   statusEl.textContent = 'Saving…';
@@ -2315,7 +2334,6 @@ async function downloadPDF() {
 
   const scen = activeScenario === 'conservative' ? 'S1_Conservative' : 'S3_Baseline';
   pdf.save(`OmniTrust_${scen}_From_Jan2027.pdf`);
-
   overlay.classList.remove('visible');
   btn.disabled = false;
   barEl.style.width = '0%';
