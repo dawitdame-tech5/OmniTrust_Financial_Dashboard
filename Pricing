@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<title>OmniTrust — Transaction Cost Tree v6b · 164 Use Cases</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f7f4;color:#2c2c2a;padding:24px}
+:root{
+  --color-background-primary:#fff;--color-background-secondary:#f1efe8;--color-background-info:#e6f1fb;
+  --color-text-primary:#2c2c2a;--color-text-secondary:#73726c;--color-text-success:#3b6d11;--color-text-info:#185fa5;
+  --color-border-tertiary:rgba(0,0,0,.12);--color-border-secondary:rgba(0,0,0,.22);--color-border-info:#85b7eb;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'SF Mono','Fira Code',monospace;
+  --np-f:#FAECE7;--np-s:#993C1D;--np-t:#712B13;--ne-f:#F1EFE8;--ne-s:#888780;--ne-t:#5F5E5A;
+  --k-f:#FAEEDA;--k-s:#854F0B;--k-t:#633806;--ci-f:#EAF3DE;--ci-s:#3B6D11;--ci-t:#27500A;
+  --cv-f:#E6F1FB;--cv-s:#185FA5;--cv-t:#0C447C;--a-f:#EEEDFE;--a-s:#534AB7;--a-t:#3C3489;
+  --py-f:#E1F5EE;--py-s:#0F6E56;--py-t:#085041;
+}
+@media(prefers-color-scheme:dark){
+  body{background:#0f0f0d;color:#e2e0d8}
+  :root{--color-background-primary:#1a1a17;--color-background-secondary:#242420;--color-background-info:#042c53;--color-text-primary:#e2e0d8;--color-text-secondary:#9c9a92;--color-text-success:#97c459;--color-text-info:#85b7eb;--color-border-tertiary:rgba(255,255,255,.1);--color-border-secondary:rgba(255,255,255,.18);--color-border-info:#185fa5;--np-f:#4A1B0C;--np-s:#F0997B;--np-t:#F5C4B3;--ne-f:#2C2C2A;--ne-s:#B4B2A9;--ne-t:#D3D1C7;--k-f:#412402;--k-s:#EF9F27;--k-t:#FAC775;--ci-f:#173404;--ci-s:#97C459;--ci-t:#C0DD97;--cv-f:#042C53;--cv-s:#85B7EB;--cv-t:#B5D4F4;--a-f:#26215C;--a-s:#AFA9EC;--a-t:#CECBF6;--py-f:#04342C;--py-s:#5DCAA5;--py-t:#9FE1CB;}
+}
+.page-header{margin-bottom:16px}.page-header h1{font-size:15px;font-weight:500}.page-header p{font-size:12px;color:var(--color-text-secondary);margin-top:3px}
+.pnl{border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:13px 15px;background:var(--color-background-primary)}
+.sl{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px}
+.pehd{font-size:10px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px;display:flex;align-items:center;gap:6px}.pehd::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary)}
+.pb{font-size:11px;padding:4px 10px;border-radius:6px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);cursor:pointer}.pb:hover,.pb.act{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.eb{font-size:10px;padding:1px 5px;border-radius:4px;background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+
+/* Use case browser */
+.uc-controls{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.uc-search{flex:1;min-width:180px;font-size:11px;padding:5px 9px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary)}
+.uc-search:focus{outline:none;border-color:var(--color-border-secondary)}
+.uc-sel{font-size:11px;padding:5px 9px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary)}
+.uc-sel:focus{outline:none}
+.uc-list{overflow-y:auto;max-height:220px;border:0.5px solid var(--color-border-tertiary);border-radius:8px}
+.uc-item{display:flex;align-items:center;gap:6px;padding:6px 9px;cursor:pointer;border-bottom:0.5px solid var(--color-border-tertiary);transition:background .1s}
+.uc-item:last-child{border-bottom:none}
+.uc-item:hover{background:var(--color-background-secondary)}
+.uc-item.sel{background:var(--color-background-info)}
+.uc-item.sel .uc-nm{color:var(--color-text-info)}
+.uc-code{font-size:9px;font-family:var(--font-mono,monospace);color:var(--color-text-secondary);white-space:nowrap;min-width:68px}
+.uc-nm{font-size:11px;color:var(--color-text-primary);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uc-badges{display:flex;gap:2px;flex-wrap:nowrap}
+.uc-b{font-size:9px;padding:1px 4px;border-radius:3px;white-space:nowrap;font-weight:500}
+.uc-cost{font-size:11px;font-weight:500;color:var(--color-text-success);font-family:var(--font-mono,monospace);min-width:42px;text-align:right}
+.uc-count{font-size:10px;color:var(--color-text-secondary);margin-top:5px}
+.pchips{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}
+.pchip{font-size:10px;padding:3px 9px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);background:transparent;cursor:pointer;color:var(--color-text-secondary);white-space:nowrap;transition:all .1s}
+.pchip:hover{border-color:var(--color-border-secondary);color:var(--color-text-primary)}
+.pchip.act{font-weight:500}
+
+/* Service picker */
+.sprow{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:8px;cursor:pointer;margin-bottom:3px;border:0.5px solid transparent;user-select:none}.sprow:hover{background:var(--color-background-secondary)}.sprow.son{border-color:var(--color-border-tertiary)}
+.spic{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--color-border-secondary);flex-shrink:0}
+.spnm{font-size:11px;font-weight:500;flex:1;min-width:55px}
+.sploas{display:flex;gap:2px}
+.splb{font-size:10px;padding:2px 6px;border-radius:4px;border:0.5px solid var(--color-border-tertiary);background:transparent;cursor:pointer;color:var(--color-text-secondary)}
+.spcost{font-size:11px;font-weight:500;min-width:44px;text-align:right;font-family:var(--font-mono,monospace);color:var(--color-text-success)}
+.sptot{display:flex;justify-content:space-between;align-items:center;padding:8px 9px 2px;border-top:0.5px solid var(--color-border-tertiary);margin-top:5px}
+
+/* Breakdown table */
+.bk{width:100%;border-collapse:collapse;font-size:11px}.bk th{padding:4px 8px;text-align:left;font-size:10px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}.bk th.r{text-align:right}.bk td{padding:5px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary)}.bk td.nd{font-weight:500;color:var(--color-text-primary);font-size:12px}.bk td.r{text-align:right}.bk td.tt{font-weight:500;color:var(--color-text-success);font-family:var(--font-mono,monospace);text-align:right}.bk .totrow td{border-top:0.5px solid var(--color-border-secondary);border-bottom:none;padding-top:7px}
+
+/* Cost panel */
+.ct{width:100%;border-collapse:collapse;font-size:11px}.ct th{padding:5px 6px;text-align:left;font-size:10px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);white-space:nowrap}.ct td{padding:5px 6px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:middle}.ct tr:last-child td{border-bottom:none}.ct .nm{font-size:11px;color:var(--color-text-primary)}.ct .asmpt{font-size:10px;color:var(--color-text-secondary);white-space:nowrap}.ct .ptx{font-size:12px;font-weight:500;color:var(--color-text-success);font-family:var(--font-mono);text-align:right;min-width:76px}.ct .grphd td{background:var(--color-background-secondary);padding:4px 6px;font-size:10px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.dt{width:100%;border-collapse:collapse;font-size:11px}.dt th{padding:4px 6px;text-align:right;font-size:10px;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);white-space:nowrap}.dt th.lc,.dt td.lc,.dt td.nd{text-align:left}.dt td{padding:4px 6px;text-align:right;border-bottom:0.5px solid var(--color-border-tertiary);font-size:11px;color:var(--color-text-secondary)}.dt td.nd{font-weight:500;color:var(--color-text-primary)}.dt td.drv{font-weight:500;color:var(--color-text-success)}.dt td.gm{font-weight:500;color:var(--ci-s)}
+.pf{border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:10px 13px;background:var(--color-background-secondary);margin-top:12px}
+input[type=number]{text-align:right;font-size:11px;padding:2px 4px;border-radius:5px;background:var(--color-background-primary);color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);font-family:var(--font-mono)}
+input[type=number]:focus{outline:none;border-color:var(--color-border-secondary)}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+/* ── Tab chrome ── */
+.tabbar{position:sticky;top:0;z-index:100;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);margin:-24px -24px 20px}
+.tabbar-inner{display:flex;align-items:center;padding:0 24px;gap:0}
+.tab-logo{font-size:12px;font-weight:500;color:var(--color-text-secondary);padding:12px 18px 12px 0;border-right:0.5px solid var(--color-border-tertiary);margin-right:4px;white-space:nowrap}
+.tabs{display:flex;gap:0}
+.tab{font-size:12px;padding:12px 16px;border:none;background:transparent;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap}
+.tab:hover{color:var(--color-text-primary)}
+.tab.act{color:var(--color-text-info);border-bottom-color:var(--color-text-info);font-weight:500}
+.tab-panel{display:none}
+.tab-panel.act{display:block}
+
+/* ════════════════════════════════════════════════════════════
+   TECH5 BRAND FACELIFT
+   Palette sourced from TECH5 Branding Guidelines v1
+   Orange #F26522 · Navy #1B3A6A · Dark teal #003148 · Green #006767
+   ════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap');
+
+:root {
+  --t5-orange:    #F26522;
+  --t5-orange-dk: #C9521A;
+  --t5-orange-lt: #FEF0E8;
+  --t5-navy:      #1B3A6A;
+  --t5-navy-dk:   #003148;
+  --t5-navy-lt:   #EEF2F8;
+  --t5-teal:      #006767;
+  --t5-teal-lt:   #E0F0F0;
+  --t5-text:      #3C3C3B;
+  --t5-text-md:   #5A5A58;
+  --t5-text-lt:   #9B9B98;
+  --t5-bg:        #F0F2F5;
+  --t5-border:    rgba(27,58,106,.13);
+  --t5-border-md: rgba(27,58,106,.22);
+  --t5-shadow:    0 1px 3px rgba(27,58,106,.09),0 1px 2px rgba(27,58,106,.05);
+
+  /* Override v7 tokens */
+  --color-background-primary:   #FFFFFF;
+  --color-background-secondary: #F0F2F5;
+  --color-background-info:      #EEF2F8;
+  --color-text-primary:         #3C3C3B;
+  --color-text-secondary:       #5A5A58;
+  --color-text-success:         #006767;
+  --color-text-info:            #1B3A6A;
+  --color-border-tertiary:      rgba(27,58,106,.11);
+  --color-border-secondary:     rgba(27,58,106,.22);
+  --color-border-info:          #1B3A6A;
+}
+
+/* ── Body ── */
+body {
+  background: var(--t5-bg);
+  font-family: 'Barlow', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Tab bar ── */
+.tabbar {
+  background:
+    url("data:image/svg+xml,%3Csvg width='56' height='48' viewBox='0 0 56 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='28,1 55,15 55,43 28,47 1,43 1,15' fill='none' stroke='rgba(255,255,255,0.06)' stroke-width='1'/%3E%3C/svg%3E") 0 0 / 56px 48px,
+    linear-gradient(135deg, #1B3A6A 0%, #003148 60%, #006767 100%);
+  border-bottom: none;
+  box-shadow: 0 3px 16px rgba(0,0,0,.28);
+  margin: -24px -24px 24px;
+}
+.tabbar-inner { padding: 0 24px; }
+
+/* ── Tab logo ── */
+.tab-logo {
+  color: #FFFFFF;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: .4px;
+  border-right: 0.5px solid rgba(255,255,255,.2);
+  padding: 14px 20px 14px 0;
+  margin-right: 8px;
+  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.tab-logo .t5-product { color: rgba(255,255,255,.55); font-size: 10px; font-weight: 500; letter-spacing: .8px; text-transform: uppercase; }
+.tab-logo .t5-brand   { color: #FFFFFF; display: flex; align-items: center; gap: 5px; }
+.tab-logo .t5-name    { color: var(--t5-orange); }
+
+/* ── Tabs ── */
+.tab {
+  color: rgba(255,255,255,.6);
+  font-family: 'Barlow', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: .2px;
+  padding: 14px 18px;
+  border-bottom: 2.5px solid transparent;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.tab:hover { color: rgba(255,255,255,.9); background: rgba(255,255,255,.07); }
+.tab.act   { color: #FFFFFF; border-bottom-color: var(--t5-orange); background: rgba(255,255,255,.09); }
+
+/* ── Panels ── */
+.pnl {
+  border: 0.5px solid var(--t5-border);
+  box-shadow: var(--t5-shadow);
+  border-radius: 10px;
+}
+
+/* ── Section labels ── */
+.sl {
+  color: var(--t5-navy);
+  font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: .25px;
+  text-transform: uppercase;
+}
+
+/* ── pehd section dividers ── */
+.pehd {
+  color: var(--t5-text-lt);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .7px;
+  text-transform: uppercase;
+}
+.pehd::after { background: rgba(242,101,34,.3); height: 1px; }
+
+/* ── Generic buttons ── */
+.pb:hover, .pb.act {
+  background: var(--t5-orange-lt);
+  color: var(--t5-orange-dk);
+  border-color: var(--t5-orange);
+}
+
+/* ── Pattern chips ── */
+.pchip.act { background: var(--t5-orange-lt); color: var(--t5-orange-dk); border-color: var(--t5-orange); }
+
+/* ── Service picker ── */
+.sprow.son { border-color: var(--t5-border); background: var(--t5-bg); }
+.sptot { border-top-color: var(--t5-border-md); }
+
+/* ── UC list ── */
+.uc-item.sel { background: var(--t5-navy-lt); }
+.uc-item.sel .uc-nm { color: var(--t5-navy); font-weight: 600; }
+.uc-search, .uc-sel {
+  border-color: var(--t5-border);
+  background: #FFFFFF;
+  color: var(--t5-text);
+  font-family: 'Barlow', sans-serif;
+}
+.uc-search:focus, .uc-sel:focus { border-color: var(--t5-navy); }
+
+/* ── Matrix ── */
+.mt tr.msel td { background: var(--t5-navy-lt); }
+.mt tr.msel td.lc { color: var(--t5-navy); }
+
+/* ── Breakdown ── */
+.bk th { color: var(--t5-text-lt); font-weight: 700; letter-spacing: .5px; }
+.bk td.tt { color: var(--t5-teal); font-weight: 700; }
+.bk .totrow td { border-top-color: var(--t5-border-md); }
+
+/* ── Derivation table ── */
+.dt td.drv { color: var(--t5-teal); }
+.dt td.gm  { color: var(--t5-teal); }
+.ctot { color: var(--t5-teal); font-weight: 700; }
+
+/* ── Range sliders ── */
+input[type=range] { accent-color: var(--t5-orange); }
+
+/* ── SVG tree cost labels ── */
+/* override via JS color is fine; these are targeted below */
+.pnl .sl::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 11px;
+  background: var(--t5-orange);
+  border-radius: 2px;
+  margin-right: 7px;
+  vertical-align: middle;
+}
+
+/* ── Inputs ── */
+input[type=number]:focus { border-color: var(--t5-navy); }
+
+/* ── Platform fraud box ── */
+.pf { background: var(--t5-bg); border-color: var(--t5-border); border-radius: 8px; }
+
+/* ── UC count badge ── */
+.uc-count { color: var(--t5-text-lt); }
+
+</style>
+</head>
+<body>
+<!-- ── Tab chrome ── -->
+<div class="tabbar">
+  <div class="tabbar-inner">
+    <div class="tab-logo">
+      <span class="t5-product">OmniTrust</span>
+      <span class="t5-brand"><span class="t5-name">TECH5</span> Transaction Volumes &amp; Revenue Estimates</span>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab act" id="tab-0" role="tab" aria-selected="true"  aria-controls="panel-0" onclick="switchTab(0)">Use case &amp; pricing</button>
+      <button class="tab"     id="tab-1" role="tab" aria-selected="false" aria-controls="panel-1" onclick="switchTab(1)">eKYC by country</button>
+      <button class="tab"     id="tab-2" role="tab" aria-selected="false" aria-controls="panel-2" onclick="switchTab(2)">Volume &amp; revenue</button>
+    </nav>
+  </div>
+</div>
+<script>
+function switchTab(n){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('act',i===n);
+    t.setAttribute('aria-selected',i===n);
+  });
+  document.querySelectorAll('.tab-panel').forEach((p,i)=>p.classList.toggle('act',i===n));
+}
+
+// ── Cross-tab shared state ──
+window.OT_SYNC = { txPrice:null, txCost:null, country:null, otr:null, tab3Rev:null, tab3Vol:null };
+</script>
+
+<!-- ── Tab panels ── -->
+<div id="panel-0" role="tabpanel" class="tab-panel act">
+
+<!-- Use case browser -->
+<div class="pnl" style="margin-bottom:10px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div class="sl" style="margin:0">Use case browser — ETH / PNG (164 use cases · 27 sectors)</div>
+    <div id="uc-count" class="uc-count"></div>
+  </div>
+  <div class="uc-controls">
+    <input class="uc-search" id="uc-search" type="search" placeholder="Search use cases…" oninput="renderUCList()">
+    <select class="uc-sel" id="uc-sector" onchange="renderUCList()">
+      <option value="">All sectors (164)</option>
+    </select>
+  </div>
+  <div class="pchips" id="pattern-chips"></div>
+  <div class="uc-list" id="uc-list" style="margin-top:8px"></div>
+</div>
+
+<div style="display:grid;grid-template-columns:232px 1fr;gap:10px;margin-bottom:10px">
+  <div class="pnl" style="padding:11px 12px">
+    <div class="sl">Services & LoA — click to select</div>
+    <div id="picker"></div>
+  </div>
+  <div class="pnl">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px">
+      <div id="trlbl" style="font-size:12px;font-weight:500;color:var(--color-text-primary)"></div>
+      <div id="trtot" style="font-size:13px;font-weight:500;color:var(--color-text-success)"></div>
+    </div>
+    <div id="trsvg"></div>
+  </div>
+</div>
+
+<div class="pnl" style="margin-bottom:10px">
+  <div class="sl">Price breakdown</div>
+  <div style="overflow-x:auto"><table class="bk" id="bktbl"></table></div>
+</div>
+
+<div class="pnl" style="margin-bottom:10px">
+  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+    <div class="sl" style="margin:0;flex:1">Transaction cost build-up</div>
+    <span style="font-size:11px;color:var(--color-text-secondary)">Markup</span>
+    <input type="range" id="sl-mgn" min="0" max="300" step="5" value="50" style="width:90px" oninput="cMgn=+this.value;document.getElementById('vl-mgn').textContent=this.value+'%';renderDeriv()">
+    <span id="vl-mgn" style="font-size:12px;font-weight:500;color:var(--color-text-primary);min-width:38px">50%</span>
+    <button class="pb" onclick="qA(0)">+0%</button><button class="pb" onclick="qA(25)">+25%</button><button class="pb act" onclick="qA(50)">+50%</button><button class="pb" onclick="qA(100)">+100%</button>
+  </div>
+  <div class="pehd">Per-transaction costs</div>
+  <div style="overflow-x:auto"><table class="ct"><thead><tr><th style="min-width:168px">Cost item</th><th>Annual source</th><th>Conversion assumption</th><th style="text-align:right;min-width:80px">$/txn</th></tr></thead><tbody id="ctbody"></tbody></table></div>
+  <div class="pf">
+    <div style="font-size:10px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">Platform annual cost — entire application</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:11px;color:var(--color-text-primary)">Fraud detection (SIEM, app enc.)</span>
+      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--color-text-secondary)">
+        <input type="number" value="0.01" step="0.001" min="0" id="fraud-rate" oninput="FRAUD.rate=+this.value;renderFraud()" style="width:50px"> /user/yr ×
+        <div id="fraud-scales" style="display:flex;gap:3px"></div>
+        users = <span id="fraud-total" style="font-size:12px;font-weight:500;color:var(--color-text-primary)"></span>
+        <span id="fraud-perm" style="color:var(--color-text-secondary)"></span>
+      </div>
+    </div>
+  </div>
+  <div class="pehd" style="margin-top:14px">Node cost derivation</div>
+  <div style="overflow-x:auto;margin-bottom:10px"><table class="dt" id="dtbl5"></table></div>
+  <div style="display:flex;justify-content:flex-end"><button class="pb" onclick="applyD5()" style="padding:5px 14px;font-size:12px">Apply to model ↗</button></div>
+</div>
+
+<div class="pnl"><div class="sl">Unit prices — editable</div><div id="pedit"></div></div>
+
+<script>
+let BASE={ci:.10,cv:.10,auth:.05,pay:.10};
+let LOA_CRED={L0:0,L1:.13,L2:.35,L3:.40};
+let LOA_AUTH={L0:0,L1:.03,L2:.25,L3:.35};
+let EKYC={T1:.23,T2:1.00,T3:1.00};
+const fp2=v=>'$'+v.toFixed(2);
+const fp3=v=>'$'+v.toFixed(3);
+const r2=v=>Math.round(v*100)/100;
+const r3=v=>Math.round(v*1000)/1000;
+const ekycDesc=t=>t==='T1'?'1:N dedup':t==='T2'?'+ data anchor':'+ 2nd anchor';
+
+const SVC_META={
+  ekyc:{label:'eKYC',            color:'var(--k-s)',  bg:'var(--k-f)',  opts:['T1','T2','T3'],      defLoa:'T1'},
+  ci:  {label:'CI — Issuance',   color:'var(--ci-s)', bg:'var(--ci-f)', opts:['L0','L1','L2','L3'], defLoa:'L1'},
+  cv:  {label:'CV — Verification',color:'var(--cv-s)',bg:'var(--cv-f)', opts:['L0','L1','L2','L3'], defLoa:'L1'},
+  auth:{label:'Auth',            color:'var(--a-s)',  bg:'var(--a-f)',  opts:['L0','L1','L2','L3'], defLoa:'L1'},
+  pay: {label:'Pay',             color:'var(--py-s)', bg:'var(--py-f)', opts:[],                    defLoa:'flat'},
+};
+
+// Service color lookups for UC badges
+const SVC_COLORS={ekyc:'#854F0B',ci:'#3B6D11',cv:'#185FA5',auth:'#534AB7',pay:'#0F6E56'};
+const SVC_BGS   ={ekyc:'#FAEEDA',ci:'#EAF3DE',cv:'#E6F1FB',auth:'#EEEDFE',pay:'#E1F5EE'};
+
+let SVCS={ekyc:{on:false,loa:'T1'},ci:{on:true,loa:'L1'},cv:{on:false,loa:'L1'},auth:{on:true,loa:'L1'},pay:{on:false,loa:'flat'}};
+let activeUC=null;
+</script>
+<script>
+// 164 use cases embedded
+const UC_DATA=[{"id":"UC-01-001","sector":"Foundational Identity & Population Registers","name":"National Digital ID — Issuance","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-01-002","sector":"Foundational Identity & Population Registers","name":"National Digital ID — Update identity attributes","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-01-003","sector":"Foundational Identity & Population Registers","name":"National Digital ID — Download verified copy","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-01-004","sector":"Foundational Identity & Population Registers","name":"Sub-national / Residency ID — Issuance & lifecycle","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-01-005","sector":"Foundational Identity & Population Registers","name":"Sub-national / Residency ID — Verification","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-01-006","sector":"Foundational Identity & Population Registers","name":"National Digital ID — Renewal","svcs":{"ekyc":null,"ci":"L1","cv":"L1","auth":"L1","pay":null}},{"id":"UC-02-001","sector":"Civil Registration & Vital Statistics","name":"Birth — Registration","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-02-002","sector":"Civil Registration & Vital Statistics","name":"Birth — Certificate issuance","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-02-003","sector":"Civil Registration & Vital Statistics","name":"Birth — Late registration","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-02-005","sector":"Civil Registration & Vital Statistics","name":"Marriage — Registration & solemnization","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-02-007","sector":"Civil Registration & Vital Statistics","name":"Death — Registration","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-02-008","sector":"Civil Registration & Vital Statistics","name":"Death — Certificate issuance","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-03-001","sector":"Citizenship & Immigration","name":"Passport — New application & issuance","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-03-002","sector":"Citizenship & Immigration","name":"Passport — Renewal","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-03-003","sector":"Citizenship & Immigration","name":"Passport — Replacement (lost or damaged)","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-03-004","sector":"Citizenship & Immigration","name":"Electronic visa — Application","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-03-006","sector":"Citizenship & Immigration","name":"Work permit — Application & issuance","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-03-007","sector":"Citizenship & Immigration","name":"Residence permit — Issuance & lifecycle","svcs":{"ekyc":"T1","ci":"L2","cv":null,"auth":null,"pay":null}},{"id":"UC-03-008","sector":"Citizenship & Immigration","name":"Student entry permit — Application & issuance","svcs":{"ekyc":"T1","ci":"L2","cv":null,"auth":null,"pay":null}},{"id":"UC-03-010","sector":"Citizenship & Immigration","name":"Citizenship status — Proof & verification","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-04-001","sector":"Financial Services","name":"Bank account opening — Identity verification","svcs":{"ekyc":"T1","ci":"L2","cv":null,"auth":null,"pay":null}},{"id":"UC-04-002","sector":"Financial Services","name":"Person-to-person transfer — Instant payment","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-04-003","sector":"Financial Services","name":"Government-to-person transfer — Disbursement","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-04-004","sector":"Financial Services","name":"Cross-border payment — Business or consumer","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-04-005","sector":"Financial Services","name":"Remittance — Customer onboarding & payout","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-04-006","sector":"Financial Services","name":"Payment wallet — Issuance & identity link","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-04-008","sector":"Financial Services","name":"Microfinance account opening","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-04-009","sector":"Financial Services","name":"Savings cooperative — Member onboarding","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-04-010","sector":"Financial Services","name":"Savings cooperative — Loan application","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-04-012","sector":"Financial Services","name":"Savings or term deposit — Account operations","svcs":{"ekyc":"T1","ci":"L2","cv":null,"auth":null,"pay":null}},{"id":"UC-04-013","sector":"Financial Services","name":"Micro-insurance — Onboarding & claims","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-04-014","sector":"Financial Services","name":"Digital credit provider — Onboarding","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-04-015","sector":"Financial Services","name":"Payment wallet — Cash-in/out & agent management","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-04-017","sector":"Financial Services","name":"Insurance policy — Onboarding (life or non-life)","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-04-018","sector":"Financial Services","name":"Capital markets account — Onboarding & due diligence","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-05-001","sector":"Social Protection & Government Benefits","name":"Social benefit — Beneficiary enrollment","svcs":{"ekyc":"T1","ci":"L0","cv":null,"auth":null,"pay":null}},{"id":"UC-05-002","sector":"Social Protection & Government Benefits","name":"Social benefit — Eligibility determination","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-05-003","sector":"Social Protection & Government Benefits","name":"Social benefit — Payment to bank account","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-05-004","sector":"Social Protection & Government Benefits","name":"Social benefit — Payment to mobile wallet","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-05-005","sector":"Social Protection & Government Benefits","name":"Social benefit — Cash-out at agent","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-05-006","sector":"Social Protection & Government Benefits","name":"Social benefit — Grievance & redress","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-05-007","sector":"Social Protection & Government Benefits","name":"Disability register — Enrollment & certificate","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-05-008","sector":"Social Protection & Government Benefits","name":"National social fund — Member registration","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-05-009","sector":"Social Protection & Government Benefits","name":"National social fund — Benefit claim","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-06-001","sector":"Telecommunications","name":"Mobile SIM — New line registration","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-06-002","sector":"Telecommunications","name":"Mobile SIM — Annual subscriber re-verification","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-06-004","sector":"Telecommunications","name":"Mobile number portability — Identity check","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-06-005","sector":"Telecommunications","name":"Fixed broadband — Subscriber identity verification","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-06-006","sector":"Telecommunications","name":"Embedded SIM — Activation & device provisioning","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-06-008","sector":"Telecommunications","name":"Digital communications account — Signup","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-06-009","sector":"Telecommunications","name":"Mobile account — Ongoing subscriber authentication","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-07-001","sector":"Health & Health Insurance","name":"Health insurance — Member enrollment","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-07-002","sector":"Health & Health Insurance","name":"Health insurance — Policy renewal","svcs":{"ekyc":null,"ci":"L1","cv":"L1","auth":"L1","pay":null}},{"id":"UC-07-003","sector":"Health & Health Insurance","name":"Health insurance — Digital card issuance","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-07-004","sector":"Health & Health Insurance","name":"Health insurance — Member claim submission","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-07-005","sector":"Health & Health Insurance","name":"Health insurance — Provider claim submission","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-07-006","sector":"Health & Health Insurance","name":"Vaccination record — Proof presentation","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-07-007","sector":"Health & Health Insurance","name":"Medical test result — Proof presentation","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-07-008","sector":"Health & Health Insurance","name":"Health professional licence — Renewal (doctor)","svcs":{"ekyc":null,"ci":"L1","cv":"L1","auth":"L1","pay":null}},{"id":"UC-07-009","sector":"Health & Health Insurance","name":"Health professional licence — Renewal (nurse)","svcs":{"ekyc":null,"ci":"L1","cv":"L1","auth":"L1","pay":null}},{"id":"UC-07-010","sector":"Health & Health Insurance","name":"Health professional licence — Renewal (pharmacist)","svcs":{"ekyc":null,"ci":"L1","cv":"L1","auth":"L1","pay":null}},{"id":"UC-07-011","sector":"Health & Health Insurance","name":"Health facility — Licensing","svcs":{"ekyc":null,"ci":"L2","cv":null,"auth":"L1","pay":null}},{"id":"UC-07-013","sector":"Health & Health Insurance","name":"Food handler — Medical fitness certificate","svcs":{"ekyc":"T1","ci":"L2","cv":null,"auth":null,"pay":null}},{"id":"UC-07-020","sector":"Health & Health Insurance","name":"Patient identity — Medical record linking","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-07-021","sector":"Health & Health Insurance","name":"Public health programme — Enrollment","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-07-022","sector":"Health & Health Insurance","name":"Health provider — Credentialing & network enrollment","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-07-023","sector":"Health & Health Insurance","name":"Electronic prescription — Dispensing & verification","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-08-001","sector":"Education & Employment","name":"School — Student enrollment","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-08-002","sector":"Education & Employment","name":"Examination — Registration","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-08-005","sector":"Education & Employment","name":"Degree or diploma — Verification","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-08-006","sector":"Education & Employment","name":"Teaching licence — Renewal","svcs":{"ekyc":null,"ci":"L1","cv":"L1","auth":"L1","pay":null}},{"id":"UC-08-007","sector":"Education & Employment","name":"Teacher registry — Onboarding & payroll update","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-08-008","sector":"Education & Employment","name":"Scholarship or grant — Application","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-08-009","sector":"Education & Employment","name":"Lifelong learning record — Skills portfolio","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-08-010","sector":"Education & Employment","name":"Academic transcript — Request & digital delivery","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-08-011","sector":"Education & Employment","name":"Vocational training — Learner registration","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-08-014","sector":"Education & Employment","name":"Vocational training — Certificate issuance","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-08-015","sector":"Education & Employment","name":"Vocational training — Certificate verification","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-08-017","sector":"Education & Employment","name":"Student loan or bursary — Application","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-09-004","sector":"Transport & Mobility — Aviation","name":"Air travel — Online check-in","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-09-005","sector":"Transport & Mobility — Aviation","name":"Air travel — Pre-departure document check","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-09-006","sector":"Transport & Mobility — Aviation","name":"Air travel — Biometric boarding","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-10-003","sector":"Transport & Mobility — Road","name":"Vehicle registration — New & insurance verification","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-10-004","sector":"Transport & Mobility — Road","name":"Driving licence — Issuance, renewal & demerit","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-10-005","sector":"Transport & Mobility — Road","name":"Vehicle roadworthiness — Inspection certificate","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-11-001","sector":"Transport & Mobility — Transit","name":"Public transit pass — Purchase","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-11-003","sector":"Transport & Mobility — Transit","name":"Public transit concession — Approval","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-11-004","sector":"Transport & Mobility — Transit","name":"Public transit gate — Entry (tap and go)","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-12-001","sector":"Cross-Border & Border Control","name":"Border crossing — Digital travel credential","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-13-001","sector":"Tourism & Hospitality","name":"Hotel — Digital check-in","svcs":{"ekyc":"T1","ci":null,"cv":null,"auth":"L1","pay":null}},{"id":"UC-13-003","sector":"Tourism & Hospitality","name":"Car rental — Pickup identity & driving privilege check","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-13-004","sector":"Tourism & Hospitality","name":"Tourist visa or visitor permit — Fast-track","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-13-005","sector":"Tourism & Hospitality","name":"Event accreditation — Registration & ticketing","svcs":{"ekyc":null,"ci":"L1","cv":"L1","auth":"L1","pay":null}},{"id":"UC-14-001","sector":"Media & Entertainment","name":"Age-restricted content — Access authorisation","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-14-002","sector":"Media & Entertainment","name":"Event ticket — Purchase","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-14-003","sector":"Media & Entertainment","name":"Venue entry — Ticket presentation","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-14-004","sector":"Media & Entertainment","name":"Subscription service — Signup or renewal","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-15-001","sector":"Commerce, Trade & Logistics","name":"Business onboarding — Know-your-business","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-15-002","sector":"Commerce, Trade & Logistics","name":"Business registration — Incorporation","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-15-003","sector":"Commerce, Trade & Logistics","name":"Online marketplace seller — Onboarding","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-15-004","sector":"Commerce, Trade & Logistics","name":"Merchant payment terminal — Onboarding","svcs":{"ekyc":"T1","ci":null,"cv":null,"auth":null,"pay":null}},{"id":"UC-15-006","sector":"Commerce, Trade & Logistics","name":"Trade document — Certificate of origin verification","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-15-008","sector":"Commerce, Trade & Logistics","name":"Customs duty — Payment","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-15-009","sector":"Commerce, Trade & Logistics","name":"Import or export permit — Application","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-15-011","sector":"Commerce, Trade & Logistics","name":"Customs clearance — Declaration & risk scoring","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-15-013","sector":"Commerce, Trade & Logistics","name":"Certificate of origin — Issuance","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-16-001","sector":"Property, Land & Housing","name":"Land title — Cadastral registration & issuance","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-16-002","sector":"Property, Land & Housing","name":"Property — Registration & title transfer","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-16-003","sector":"Property, Land & Housing","name":"Land title — Verification","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-16-004","sector":"Property, Land & Housing","name":"Lease — Application","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-16-005","sector":"Property, Land & Housing","name":"Tenancy — Applicant screening","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-16-006","sector":"Property, Land & Housing","name":"Building permit & occupancy certificate","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-16-008","sector":"Property, Land & Housing","name":"Property tax — Payment","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-16-009","sector":"Property, Land & Housing","name":"Housing subsidy — Application","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-17-001","sector":"Utilities & Energy","name":"Electricity — New service connection","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-17-002","sector":"Utilities & Energy","name":"Water — New service connection","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-17-004","sector":"Utilities & Energy","name":"Utility subsidy or relief — Application","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-17-005","sector":"Utilities & Energy","name":"Clean cooking programme — Beneficiary enrollment","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-17-007","sector":"Utilities & Energy","name":"Utility customer — Identity refresh & arrears recovery","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-18-001","sector":"Justice, Public Safety & Elections","name":"Voter registration — New or transfer","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-18-002","sector":"Justice, Public Safety & Elections","name":"Election worker — Accreditation & custody chain","svcs":{"ekyc":null,"ci":"L1","cv":"L1","auth":"L1","pay":null}},{"id":"UC-18-003","sector":"Justice, Public Safety & Elections","name":"Legal professional — Credential check","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-18-006","sector":"Justice, Public Safety & Elections","name":"Court — Electronic filing submission","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-18-007","sector":"Justice, Public Safety & Elections","name":"Police — Incident reporting","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-18-008","sector":"Justice, Public Safety & Elections","name":"Police clearance — Criminal record certificate","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-18-010","sector":"Justice, Public Safety & Elections","name":"Legal aid — Public defender intake","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-18-012","sector":"Justice, Public Safety & Elections","name":"Voter eligibility — Identity check","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-21-001","sector":"Civil Service","name":"Civil servant identity card — Issuance & lifecycle","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-21-002","sector":"Civil Service","name":"Civil servant identity card — Verification","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-21-003","sector":"Civil Service","name":"Government services portal — Account creation","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-22-001","sector":"Security Services & Emergency Personnel","name":"Defence forces personnel ID — Issuance & lifecycle","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-22-002","sector":"Security Services & Emergency Personnel","name":"Police personnel ID — Issuance & lifecycle","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-23-001","sector":"Agriculture, Forestry & Rural Services","name":"Farmer registry — Household & plot registration","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-23-003","sector":"Agriculture, Forestry & Rural Services","name":"Produce traceability — Certificate of origin","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-23-005","sector":"Agriculture, Forestry & Rural Services","name":"Agricultural extension — Farmer enrollment","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-23-006","sector":"Agriculture, Forestry & Rural Services","name":"Agricultural input subsidy — Electronic voucher","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-23-007","sector":"Agriculture, Forestry & Rural Services","name":"Livestock identification — Tag issuance & updates","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-23-008","sector":"Agriculture, Forestry & Rural Services","name":"Livestock movement — Permit & health attestation","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-23-009","sector":"Agriculture, Forestry & Rural Services","name":"Rural landholding certificate — Issuance","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-23-011","sector":"Agriculture, Forestry & Rural Services","name":"Farmers cooperative — Governance","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-24-002","sector":"Environment & Natural Resources","name":"Extractive industries licence — Mining or quarrying","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-25-001","sector":"Disaster Risk Management & Humanitarian Aid","name":"Disaster response — Beneficiary targeting & registry","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-25-002","sector":"Disaster Risk Management & Humanitarian Aid","name":"Humanitarian aid — Cash or in-kind distribution","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-25-003","sector":"Disaster Risk Management & Humanitarian Aid","name":"Early warning — Subscription & evacuation list","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-26-001","sector":"Municipal & Local Government Services","name":"Local government — Service desk & complaint ticketing","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-26-003","sector":"Municipal & Local Government Services","name":"Local government — Parking penalty payment","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-26-004","sector":"Municipal & Local Government Services","name":"Local government — Civil fees & levies","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-26-005","sector":"Municipal & Local Government Services","name":"Community programme — Enrollment & targeting","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-26-006","sector":"Municipal & Local Government Services","name":"Local elections — Civic registry & participation","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-26-007","sector":"Municipal & Local Government Services","name":"Local government — Service request & tracking","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-26-008","sector":"Municipal & Local Government Services","name":"Municipal business licence — SME","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-26-009","sector":"Municipal & Local Government Services","name":"Property rates & land tax — Assessment & payment","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-26-010","sector":"Municipal & Local Government Services","name":"Waste collection — Subscription & payment","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-26-015","sector":"Municipal & Local Government Services","name":"Grievance & ombudsperson — Intake","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-27-001","sector":"Tax & Revenue Administration","name":"Taxpayer registration — Identification number","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-27-002","sector":"Tax & Revenue Administration","name":"Tax filing — Submission & payment authorisation","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-27-003","sector":"Tax & Revenue Administration","name":"Withholding tax — Returns & reconciliation","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-27-004","sector":"Tax & Revenue Administration","name":"Tax compliance — Audit & case management","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-27-005","sector":"Tax & Revenue Administration","name":"Property tax — Valuation & electronic assessment","svcs":{"ekyc":null,"ci":null,"cv":null,"auth":"L0","pay":null}},{"id":"UC-28-001","sector":"Digital Economy & Innovation","name":"Digital wallet — Issuance & identity-linked account","svcs":{"ekyc":"T1","ci":"L1","cv":null,"auth":null,"pay":null}},{"id":"UC-28-002","sector":"Digital Economy & Innovation","name":"Personal data exchange — Consent registry","svcs":{"ekyc":null,"ci":"L1","cv":"L1","auth":"L1","pay":null}},{"id":"UC-30-004","sector":"Other Services","name":"Private membership pass — Gym, library or club","svcs":{"ekyc":null,"ci":"L1","cv":null,"auth":"L1","pay":null}},{"id":"UC-30-007","sector":"Other Services","name":"Gaming or lottery — Player age-verification","svcs":{"ekyc":null,"ci":null,"cv":"L1","auth":"L1","pay":null}},{"id":"UC-30-008","sector":"Other Services","name":"Prize claim — Identity verification & payout","svcs":{"ekyc":"T1","ci":null,"cv":"L1","auth":"L1","pay":null}}];
+</script>
+<script>
+// Build sector list for dropdown
+const SECTORS = [...new Set(UC_DATA.map(u=>u.sector))].sort();
+const sel = document.getElementById('uc-sector');
+SECTORS.forEach(s => {
+  const o=document.createElement('option');o.value=s;
+  const n=UC_DATA.filter(u=>u.sector===s).length;
+  o.textContent=`${s} (${n})`;sel.appendChild(o);
+});
+
+// Pattern definitions — sequential, exhaustive, mutually exclusive (164 total)
+const PATTERNS=[
+  {id:'onboarding',   label:'Onboarding',   desc:'eKYC + CI — new identity & credential issuance',             color:'var(--ci-s)',  bg:'var(--ci-f)',  match:s=> s.ekyc && s.ci},
+  {id:'id_check',     label:'ID check',     desc:'eKYC, no CI — check identity against data anchor or record', color:'var(--k-s)',   bg:'var(--k-f)',   match:s=> s.ekyc && !s.ci},
+  {id:'auth_only',    label:'Auth only',    desc:'Auth alone — authentication or payment, no issuance/verify', color:'var(--a-s)',   bg:'var(--a-f)',   match:s=> s.auth && !s.ekyc && !s.ci && !s.cv},
+  {id:'verification', label:'Verification', desc:'CV + Auth, no eKYC/CI — verify existing credential',         color:'var(--cv-s)',  bg:'var(--cv-f)',  match:s=> s.cv && s.auth && !s.ekyc && !s.ci},
+  {id:'renewal',      label:'Renewal',      desc:'CI + Auth, no eKYC — update credential on existing identity',color:'var(--np-s)', bg:'var(--np-f)',  match:s=> s.ci && s.auth && !s.ekyc && !s.cv},
+  {id:'lifecycle',    label:'Lifecycle',    desc:'CI + CV + Auth — full credential renewal / update cycle',    color:'var(--py-s)', bg:'var(--py-f)',  match:s=> s.ci && s.cv && s.auth},
+];
+let activePattern=null;
+
+function getPattern(svcs){
+  for(const p of PATTERNS){if(p.match(svcs))return p.id;}
+  return null;
+}
+
+function renderPatternChips(preFiltered){
+  const counts={};
+  PATTERNS.forEach(p=>counts[p.id]=0);
+  preFiltered.forEach(u=>{const pid=getPattern(u.svcs);if(pid)counts[pid]++;});
+  document.getElementById('pattern-chips').innerHTML=PATTERNS.map(p=>{
+    const n=counts[p.id];
+    if(!n)return '';
+    const act=activePattern===p.id;
+    return`<button class="pchip${act?' act':''}" title="${p.desc}"
+      style="${act?`background:${p.bg};color:${p.color};border-color:${p.color}`:''}"
+      onclick="togglePattern('${p.id}')">${p.label} <span style="opacity:.65">${n}</span></button>`;
+  }).join('');
+}
+
+function togglePattern(id){activePattern=activePattern===id?null:id;renderUCList();}
+
+function ucCost(svcs) {
+  let t=0;
+  if(svcs.ekyc)t+=EKYC[svcs.ekyc]||0;
+  if(svcs.ci)  t+=r2(BASE.ci+(LOA_CRED[svcs.ci]||0));
+  if(svcs.cv)  t+=r2(BASE.cv+(LOA_CRED[svcs.cv]||0));
+  if(svcs.auth)t+=r2(BASE.auth+(LOA_AUTH[svcs.auth]||0));
+  if(svcs.pay) t+=BASE.pay;
+  return r2(t);
+}
+
+function renderUCList() {
+  const q=(document.getElementById('uc-search').value||'').toLowerCase();
+  const sc=document.getElementById('uc-sector').value;
+  // Pre-pattern filter (for chip counts)
+  const preFiltered=UC_DATA.filter(u=>{
+    if(sc && u.sector!==sc) return false;
+    if(q && !u.name.toLowerCase().includes(q) && !u.id.toLowerCase().includes(q) && !u.sector.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderPatternChips(preFiltered);
+  // Apply pattern filter
+  const filtered=activePattern?preFiltered.filter(u=>getPattern(u.svcs)===activePattern):preFiltered;
+  document.getElementById('uc-count').textContent=`${filtered.length} of ${UC_DATA.length}`;
+  const list=document.getElementById('uc-list');
+  if(!filtered.length){list.innerHTML=`<div style="padding:12px;font-size:11px;color:var(--color-text-secondary);text-align:center">No results</div>`;return;}
+  let html='',lastSec='';
+  filtered.forEach(u=>{
+    if(u.sector!==lastSec){
+      if(lastSec) html+=`</div>`;
+      html+=`<div style="padding:4px 9px 2px;font-size:9px;font-weight:600;color:var(--color-text-secondary);background:var(--color-background-secondary);letter-spacing:.04em;border-bottom:0.5px solid var(--color-border-tertiary)">${u.sector}</div>`;
+      lastSec=u.sector;
+    }
+    const cost=ucCost(u.svcs);
+    const badges=Object.entries(u.svcs).filter(([k,v])=>v).map(([k,v])=>
+      `<span class="uc-b" style="background:${SVC_BGS[k]};color:${SVC_COLORS[k]}">${k==='ekyc'?'eKYC':k.toUpperCase()} ${v}</span>`).join('');
+    // Pattern dot
+    const pid=getPattern(u.svcs);
+    const pat=pid?PATTERNS.find(p=>p.id===pid):null;
+    const dot=pat?`<span style="width:6px;height:6px;border-radius:50%;background:${pat.color};flex-shrink:0;display:inline-block;margin-right:2px" title="${pat.label}"></span>`:'';
+    html+=`<div class="uc-item${activeUC===u.id?' sel':''}" onclick="applyUC('${u.id}')">
+      ${dot}<span class="uc-code">${u.id}</span>
+      <span class="uc-nm">${u.name}</span>
+      <span class="uc-badges">${badges}</span>
+      <span class="uc-cost">${fp2(cost)}</span>
+    </div>`;
+  });
+  list.innerHTML=html;
+}
+
+function applyUC(id) {
+  const uc=UC_DATA.find(u=>u.id===id);if(!uc)return;
+  activeUC=id;
+  Object.keys(SVCS).forEach(k=>{
+    if(uc.svcs[k]){SVCS[k].on=true;SVCS[k].loa=uc.svcs[k];}
+    else{SVCS[k].on=false;}
+  });
+  renderUCList();renderPicker();renderBreakdown();renderTree();
+}
+
+// Service picker, tree, breakdown, cost build-up (unchanged from v6)
+function svcCost(k){if(!SVCS[k].on)return 0;if(k==='ekyc')return EKYC[SVCS.ekyc.loa]||0;if(k==='ci')return r2(BASE.ci+(LOA_CRED[SVCS.ci.loa]||0));if(k==='cv')return r2(BASE.cv+(LOA_CRED[SVCS.cv.loa]||0));if(k==='auth')return r2(BASE.auth+(LOA_AUTH[SVCS.auth.loa]||0));if(k==='pay')return BASE.pay;return 0;}
+const calcTotal=()=>Object.keys(SVCS).reduce((s,k)=>s+svcCost(k),0);
+function getNodes(){const n=[];if(SVCS.ekyc.on){const t=SVCS.ekyc.loa;n.push({type:'ekyc',label:`eKYC ${t}`,desc:ekycDesc(t),base:EKYC[t],addon:0,total:EKYC[t]});}if(SVCS.ci.on){const l=SVCS.ci.loa;n.push({type:'ci',label:'CI',desc:`Issuance · ${l}`,base:BASE.ci,addon:LOA_CRED[l]||0,total:BASE.ci+(LOA_CRED[l]||0)});}if(SVCS.cv.on){const l=SVCS.cv.loa;n.push({type:'cv',label:'CV',desc:`Verification · ${l}`,base:BASE.cv,addon:LOA_CRED[l]||0,total:BASE.cv+(LOA_CRED[l]||0)});}if(SVCS.auth.on){const l=SVCS.auth.loa;n.push({type:'auth',label:'Auth',desc:`Auth · ${l}`,base:BASE.auth,addon:LOA_AUTH[l]||0,total:BASE.auth+(LOA_AUTH[l]||0)});}if(SVCS.pay.on){n.push({type:'pay',label:'Pay',desc:'Flat fee',base:BASE.pay,addon:0,total:BASE.pay});}return n;}
+function getTxnName(){if(activeUC){const u=UC_DATA.find(u=>u.id===activeUC);if(u)return u.name.length>32?u.name.slice(0,31)+'…':u.name;}const on=Object.keys(SVCS).filter(k=>SVCS[k].on);if(!on.length)return 'No services selected';if(on.length===1&&on[0]==='auth')return 'Authentication';if(on.includes('ekyc')&&on.includes('ci'))return 'ID onboarding';if(on.includes('cv')&&on.includes('auth'))return 'ID verification';return `Custom (${on.length})`;}
+function getMaxLoA(){const rank={'L0':0,'flat':0,'T1':1,'L1':1,'T2':2,'L2':2,'T3':3,'L3':3};let max=0,ml='L0';Object.keys(SVCS).filter(k=>SVCS[k].on).forEach(k=>{const r=rank[SVCS[k].loa]||0;if(r>max){max=r;ml=SVCS[k].loa;}});return ml;}
+function toggleSvc(k){SVCS[k].on=!SVCS[k].on;if(SVCS[k].on){const m=SVC_META[k];if(m.opts.length)SVCS[k].loa=m.defLoa;}activeUC=null;renderUCList();renderPicker();renderBreakdown();renderTree();}
+function setLoa(k,loa){if(!SVCS[k].on)SVCS[k].on=true;SVCS[k].loa=loa;activeUC=null;renderUCList();renderPicker();renderBreakdown();renderTree();}
+function renderPicker(){let h='';Object.keys(SVCS).forEach(k=>{const s=SVCS[k],m=SVC_META[k],on=s.on;h+=`<div class="sprow${on?' son':''}" onclick="toggleSvc('${k}')"><div class="spic" style="border-color:${on?m.color:'var(--color-border-secondary)'};${on?`background:${m.color}`:''}"></div><div class="spnm" style="color:${on?m.color:'var(--color-text-secondary)'}">${m.label}</div><div class="sploas">${m.opts.map(opt=>{const sel=on&&s.loa===opt;return`<button class="splb${sel?' spon':''}" style="${sel?`background:${m.color};color:#fff;border-color:${m.color};font-weight:500`:`opacity:${on?1:0.3};pointer-events:${on?'auto':'none'}`}" onclick="event.stopPropagation();setLoa('${k}','${opt}')">${opt}</button>`;}).join('')}${m.opts.length===0?`<span style="font-size:10px;color:${on?m.color:'var(--color-text-secondary)'};opacity:${on?1:0.4}">flat</span>`:''}</div><div class="spcost">${on?fp2(svcCost(k)):'—'}</div></div>`;});const tot=calcTotal(),on=Object.keys(SVCS).filter(k=>SVCS[k].on).length;h+=`<div class="sptot"><span style="font-size:11px;color:var(--color-text-secondary)">${on} service${on!==1?'s':''} · ${getMaxLoA()}</span><span style="font-size:14px;font-weight:500;color:var(--color-text-success);font-family:var(--font-mono)">${fp2(tot)}</span></div>`;document.getElementById('picker').innerHTML=h;}
+function renderBreakdown(){const nodes=getNodes(),tot=calcTotal();if(!nodes.length){document.getElementById('bktbl').innerHTML=`<tr><td colspan="5" style="padding:10px 8px;font-size:11px;color:var(--color-text-secondary);font-style:italic">Select a use case or toggle services above</td></tr>`;return;}let h=`<thead><tr><th>Service</th><th>LoA / Tier</th><th class="r">Base</th><th class="r">Add-on</th><th class="r">Total</th></tr></thead><tbody>`;nodes.forEach(nd=>{const k=nd.type,m=SVC_META[k],hasAddon=nd.addon>0;h+=`<tr><td class="nd" style="color:${m.color}">${nd.label}</td><td><span class="eb" style="color:${m.color};border-color:${m.color};background:${m.bg}">${SVCS[k].loa||'—'}</span></td><td class="r">${hasAddon?fp2(nd.base):'—'}</td><td class="r">${hasAddon?'+'+fp2(nd.addon):nd.type==='pay'?'flat fee':'—'}</td><td class="tt">${fp2(nd.total)}</td></tr>`;});h+=`</tbody><tfoot><tr class="totrow"><td colspan="4" style="text-align:right;font-weight:500;font-size:11px;color:var(--color-text-secondary)">Transaction total</td><td class="tt" style="font-size:13px">${fp2(tot)}</td></tr></tfoot>`;document.getElementById('bktbl').innerHTML=h;}
+function renderTree(){const nodes=getNodes(),nn=nodes.length;if(!nn){document.getElementById('trsvg').innerHTML=`<div style="height:80px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--color-text-secondary)">Select a use case to visualize</div>`;document.getElementById('trlbl').textContent='';document.getElementById('trtot').textContent='';return;}const tot=calcTotal(),name=getTxnName(),maxLoA=getMaxLoA();document.getElementById('trlbl').textContent=`${name}  ·  ${nn} node${nn!==1?'s':''}`;document.getElementById('trtot').textContent=fp2(tot);const svgH=Math.max(130,nn*82+48),cy=svgH/2,TOP=42;const nYs=nn===1?[cy]:nodes.map((_,i)=>TOP+i*(svgH-2*TOP)/(nn-1));const PX=46,PR=18,EX=92,EW=160,EH=50,SX=318,SW=148,SH=50,ECX=EX+EW/2,SCX=SX+SW/2,MX=(EX+EW+SX)/2,TPX=476;const SV={ekyc:'k',ci:'ci',cv:'cv',auth:'a',pay:'py'};let s=`<defs><marker id="arr6b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>`;s+=`<line x1="${PX+PR}" y1="${cy}" x2="${EX}" y2="${cy}" stroke="var(--color-border-secondary)" stroke-width="1" fill="none" marker-end="url(#arr6b)"/>`;nodes.forEach((_,i)=>{const ny=nYs[i];s+=`<path d="M ${EX+EW} ${cy} C ${MX} ${cy} ${MX} ${ny} ${SX} ${ny}" stroke="var(--color-border-secondary)" stroke-width="0.8" fill="none"/>`;s+=`<circle cx="${SX}" cy="${ny}" r="2.5" style="fill:var(--${SV[nodes[i].type]}-s)"/>`;});s+=`<circle cx="${PX}" cy="${cy}" r="${PR}" style="fill:var(--np-f);stroke:var(--np-s);stroke-width:0.5"/>`;s+=`<circle cx="${PX}" cy="${cy-5}" r="5" style="fill:var(--np-t)"/>`;s+=`<path d="M ${PX-9} ${cy+13} C ${PX-9} ${cy+4} ${PX+9} ${cy+4} ${PX+9} ${cy+13}" style="fill:none;stroke:var(--np-t);stroke-width:1.5;stroke-linecap:round"/>`;s+=`<text x="${PX}" y="${cy+PR+13}" text-anchor="middle" style="font-size:10px;font-family:var(--font-sans);fill:var(--color-text-secondary)">Person</text>`;const ey=cy-EH/2;s+=`<rect x="${EX}" y="${ey}" width="${EW}" height="${EH}" rx="8" style="fill:var(--ne-f);stroke:var(--ne-s);stroke-width:0.5"/>`;const n1=name.length>22?name.slice(0,21)+'…':name;s+=`<text x="${ECX}" y="${ey+15}" text-anchor="middle" dominant-baseline="central" style="font-size:11px;font-weight:500;font-family:var(--font-sans);fill:var(--ne-t)">${n1}</text>`;s+=`<text x="${ECX}" y="${ey+33}" text-anchor="middle" dominant-baseline="central" style="font-size:10px;font-family:var(--font-sans);fill:var(--ne-t);opacity:0.75">${nn} service${nn!==1?'s':''} · max ${maxLoA}</text>`;nodes.forEach((nd,i)=>{const ny=nYs[i],sy=ny-SH/2,v=SV[nd.type];s+=`<rect x="${SX}" y="${sy}" width="${SW}" height="${SH}" rx="7" style="fill:var(--${v}-f);stroke:var(--${v}-s);stroke-width:0.5"/>`;s+=`<text x="${SCX}" y="${sy+16}" text-anchor="middle" dominant-baseline="central" style="font-size:12px;font-weight:500;font-family:var(--font-sans);fill:var(--${v}-t)">${nd.label}</text>`;s+=`<text x="${SCX}" y="${sy+34}" text-anchor="middle" dominant-baseline="central" style="font-size:10px;font-family:var(--font-sans);fill:var(--${v}-t);opacity:0.75">${nd.desc}</text>`;if(nd.addon>0){s+=`<text x="${TPX}" y="${ny-12}" dominant-baseline="central" style="font-size:9px;font-family:var(--font-mono);fill:var(--color-text-secondary)">${fp2(nd.base)} base</text>`;s+=`<text x="${TPX}" y="${ny+2}" dominant-baseline="central" style="font-size:9px;font-family:var(--font-mono);fill:var(--color-text-secondary)">+${fp2(nd.addon)} ${SVCS[nd.type].loa}</text>`;s+=`<text x="${TPX}" y="${ny+17}" dominant-baseline="central" style="font-size:13px;font-weight:500;font-family:var(--font-mono);fill:var(--color-text-success)">${fp2(nd.total)}</text>`;}else{s+=`<text x="${TPX}" y="${ny+2}" dominant-baseline="central" style="font-size:13px;font-weight:500;font-family:var(--font-mono);fill:var(--color-text-success)">${fp2(nd.total)}</text>`;s+=`<text x="${TPX}" y="${ny+17}" dominant-baseline="central" style="font-size:9px;font-family:var(--font-sans);fill:var(--color-text-secondary)">${nd.type==='pay'?'flat fee':'base only'}</text>`;}});const lastNy=nYs[nn-1],totY=lastNy+SH/2+10;s+=`<line x1="${TPX-2}" y1="${totY}" x2="${TPX+80}" y2="${totY}" stroke="var(--color-border-secondary)" stroke-width="0.5"/>`;s+=`<text x="${TPX}" y="${totY+15}" dominant-baseline="central" style="font-size:9px;font-family:var(--font-sans);fill:var(--color-text-secondary)">total</text>`;s+=`<text x="${TPX+80}" y="${totY+15}" text-anchor="end" dominant-baseline="central" style="font-size:12px;font-weight:500;font-family:var(--font-mono);fill:var(--color-text-success)">${fp2(tot)}</text>`;document.getElementById('trsvg').innerHTML=`<svg width="100%" viewBox="0 0 680 ${svgH+36}" role="img" aria-label="${name}"><title>${name}</title>${s}</svg>`;}
+
+let COSTS={vw:{name:'Virtual Wallet platform',type:'user',annual:0.08,evts:25,evtsLabel:'all txns/yr'},liven:{name:'Face liveness (ISO 30107)',type:'user',annual:0.15,evts:3,evtsLabel:'liveness evts/yr'},finger:{name:'Finger capture + maintenance',type:'user',annual:0.15,evts:10,evtsLabel:'bio evts/yr'},abis:{name:'ABIS (1:N deduplication)',type:'user',annual:0.04,evts:1,evtsLabel:'eKYC evts/yr'},didcomm:{name:'Secure messaging (DIDComm v2)',type:'txn',cost:0.010,note:'Encrypted async relay — assumed'},crypto:{name:'Offline cryptographic encoding (iIDencode)',type:'txn',cost:0.050,note:'Tech5 product — assumed'},anchor1:{name:'Data anchor query (eKYC T2)',type:'txn',cost:0.500,note:'External registry API — assumed'},anchor2:{name:'2nd data anchor (eKYC T3)',type:'txn',cost:0.500,note:'Split equally — assumed'},otp:{name:'Step-up OTP / challenge (Auth L3)',type:'txn',cost:0.020,note:'Local OTP rates — assumed'}};
+let FRAUD={rate:0.01,users:5e6};const FRAUD_SCALES=[1e6,5e6,10e6,25e6,50e6];let cMgn=50;
+function ptxn(k){const c=COSTS[k];return c.type==='user'?c.annual/c.evts:c.cost;}
+function nodeCosts(){const bv=ptxn('vw'),lv=ptxn('liven'),fv=ptxn('finger'),av=ptxn('abis'),dm=ptxn('didcomm'),cr=ptxn('crypto'),an1=ptxn('anchor1'),an2=ptxn('anchor2'),op=ptxn('otp'),base=bv+dm;return{'Base CI/CV':{vc:base,comp:'VW + DIDComm v2'},'Base Auth':{vc:base*.5,comp:'(VW+DIDComm) × 0.5'},'eKYC T1':{vc:base+av,comp:'Base + ABIS'},'eKYC T2':{vc:base+av+lv+an1,comp:'Base + ABIS + Liveness + DataAnchor'},'eKYC T3':{vc:base+av+lv+an1+an2,comp:'T2 + 2nd anchor'},'Cred L1':{vc:fv,comp:'Finger capture'},'Cred L2':{vc:fv+lv,comp:'Finger + Liveness'},'Cred L3':{vc:fv+lv+cr,comp:'Finger + Liveness + iIDencode'},'Auth L1':{vc:fv,comp:'Finger capture'},'Auth L2':{vc:fv+lv,comp:'Finger + Liveness'},'Auth L3':{vc:fv+lv+op,comp:'Finger + Liveness + OTP'}};}
+function renderCostTbl(){const ni=(k,f,v,w,step)=>`<input type="number" value="${v}" step="${step||0.01}" min="0" data-k="${k}" data-f="${f}" oninput="updC(this)" style="width:${w||52}px">`;let h='';let inTxn=false;Object.entries(COSTS).forEach(([k,c])=>{if(c.type==='txn'&&!inTxn){inTxn=true;h+=`<tr class="grphd"><td colspan="4">Direct per-transaction · assumed</td></tr>`;}if(c.type==='user'){h+=`<tr><td class="nm">${c.name}</td><td class="asmpt">${ni(k,'annual',c.annual.toFixed(2),52)} /user/yr</td><td class="asmpt">÷ ${ni(k,'evts',c.evts,36,1)} ${c.evtsLabel}</td><td id="ptx-${k}" class="ptx">${fp3(ptxn(k))}</td></tr>`;}else{h+=`<tr><td class="nm">${c.name}<div style="font-size:9px;color:var(--color-text-secondary);font-style:italic;margin-top:1px">${c.note}</div></td><td class="asmpt" colspan="2">direct per-transaction</td><td class="ptx"><input type="number" value="${c.cost.toFixed(3)}" step="0.001" min="0" data-k="${k}" data-f="cost" oninput="updC(this)" style="width:72px;font-weight:500;color:var(--color-text-success);font-family:var(--font-mono);border-color:var(--ci-s)"></td></tr>`;}});document.getElementById('ctbody').innerHTML=h;}
+function updC(inp){const{k,f}=inp.dataset;const v=parseFloat(inp.value);if(!isNaN(v)&&v>=0){COSTS[k][f]=v;const el=document.getElementById('ptx-'+k);if(el)el.textContent=fp3(ptxn(k));renderDeriv();}}
+function renderFraud(){document.getElementById('fraud-scales').innerHTML=FRAUD_SCALES.map(u=>`<button class="pb${FRAUD.users===u?' act':''}" onclick="FRAUD.users=${u};renderFraud()" style="padding:2px 7px;font-size:10px">${(u/1e6).toFixed(0)}M</button>`).join('');const t=FRAUD.rate*FRAUD.users,pm=FRAUD.rate*1e6;document.getElementById('fraud-total').textContent='$'+t.toLocaleString('en-US',{maximumFractionDigits:0})+'/yr';document.getElementById('fraud-perm').textContent='· $'+pm.toLocaleString('en-US',{maximumFractionDigits:0})+'/M users';}
+function renderDeriv(){const nc=nodeCosts(),m=1+cMgn/100;let h=`<thead><tr><th class="lc">Node</th><th style="text-align:left">Components</th><th>Cost/txn</th><th>Markup</th><th>Price</th><th>Gross margin</th></tr></thead><tbody>`;Object.entries(nc).forEach(([nd,{vc,comp}])=>{const price=r2(vc*m);const gm=price>0?(((price-vc)/price)*100).toFixed(1)+'%':'—';h+=`<tr><td class="nd">${nd}</td><td style="text-align:left;font-size:10px;color:var(--color-text-secondary)">${comp}</td><td>${fp3(r3(vc))}</td><td style="color:var(--color-text-secondary)">+${cMgn}%</td><td class="drv">${fp2(price)}</td><td class="gm">${gm}</td></tr>`;});document.getElementById('dtbl5').innerHTML=h+'</tbody>';}
+function deriveUP5(){const nc=nodeCosts(),m=1+cMgn/100;return{BASE:{ci:r2(nc['Base CI/CV'].vc*m),cv:r2(nc['Base CI/CV'].vc*m),auth:r2(nc['Base Auth'].vc*m),pay:r2(.03*m)},LOA_CRED:{L0:0,L1:r2(nc['Cred L1'].vc*m),L2:r2(nc['Cred L2'].vc*m),L3:r2(nc['Cred L3'].vc*m)},LOA_AUTH:{L0:0,L1:r2(nc['Auth L1'].vc*m),L2:r2(nc['Auth L2'].vc*m),L3:r2(nc['Auth L3'].vc*m)},EKYC:{T1:r2(nc['eKYC T1'].vc*m),T2:r2(nc['eKYC T2'].vc*m),T3:r2(nc['eKYC T3'].vc*m)}};}
+function qA(pct){const sm=cMgn;cMgn=pct;const d=deriveUP5();cMgn=sm;Object.assign(BASE,d.BASE);Object.assign(LOA_CRED,d.LOA_CRED);Object.assign(LOA_AUTH,d.LOA_AUTH);Object.assign(EKYC,d.EKYC);renderUCList();renderPicker();renderBreakdown();renderTree();}
+function applyD5(){const d=deriveUP5();Object.assign(BASE,d.BASE);Object.assign(LOA_CRED,d.LOA_CRED);Object.assign(LOA_AUTH,d.LOA_AUTH);Object.assign(EKYC,d.EKYC);renderUCList();renderPicker();renderBreakdown();renderTree();}
+function renderPriceEdit(){const fi=(lbl,val,obj,key,col)=>`<div style="display:flex;flex-direction:column;gap:3px"><label style="font-size:10px;font-weight:500;color:${col}">${lbl}</label><input type="number" value="${val.toFixed(2)}" step="0.01" min="0" data-obj="${obj}" data-key="${key}" oninput="onP(this)" style="border:0.5px solid ${col};width:100%"></div>`;const sec=(t,cols,c)=>`<div><div class="pehd">${t}</div><div style="display:grid;grid-template-columns:${cols};gap:6px">${c}</div></div>`;document.getElementById('pedit').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px">${sec('Base (L0)','repeat(4,1fr)',fi('CI base',BASE.ci,'BASE','ci','var(--ci-s)')+fi('CV base',BASE.cv,'BASE','cv','var(--cv-s)')+fi('Auth base',BASE.auth,'BASE','auth','var(--a-s)')+fi('Pay flat',BASE.pay,'BASE','pay','var(--py-s)'))}${sec('eKYC tiers','repeat(3,1fr)',fi('T1',EKYC.T1,'EKYC','T1','var(--k-s)')+fi('T2',EKYC.T2,'EKYC','T2','var(--k-s)')+fi('T3',EKYC.T3,'EKYC','T3','var(--k-s)'))}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">${sec('Credential LoA add-on','repeat(3,1fr)',fi('L1',LOA_CRED.L1,'LOA_CRED','L1','var(--ci-s)')+fi('L2',LOA_CRED.L2,'LOA_CRED','L2','var(--ci-s)')+fi('L3',LOA_CRED.L3,'LOA_CRED','L3','var(--ci-s)'))}${sec('Auth LoA add-on','repeat(3,1fr)',fi('L1',LOA_AUTH.L1,'LOA_AUTH','L1','var(--a-s)')+fi('L2',LOA_AUTH.L2,'LOA_AUTH','L2','var(--a-s)')+fi('L3',LOA_AUTH.L3,'LOA_AUTH','L3','var(--a-s)'))}</div>`;}
+function onP(inp){const v=parseFloat(inp.value);if(!isNaN(v)&&v>=0){const{obj,key}=inp.dataset;if(obj==='BASE')BASE[key]=v;else if(obj==='EKYC')EKYC[key]=v;else if(obj==='LOA_CRED')LOA_CRED[key]=v;else LOA_AUTH[key]=v;renderPicker();renderBreakdown();renderTree();renderUCList();}}
+
+renderUCList();renderPicker();renderBreakdown();renderTree();
+renderCostTbl();renderFraud();renderDeriv();renderPriceEdit();
+// Publish pricing to cross-tab state whenever it changes
+// ── Tab-1 pricing exports for Tab-3 cross-tab sync ───────────────
+window.getTab1Price = function(ucType){
+  const mk=1+cMgn/100;
+  const p={
+    kyc:   (EKYC.T1 + BASE.ci + (LOA_CRED.L1||0))                                        * mk,
+    pay:   (BASE.auth)                                                                     * mk,
+    gov:   (BASE.cv + (LOA_CRED.L1||0) + BASE.auth + (LOA_AUTH.L1||0))                   * mk,
+    health:(EKYC.T1 + BASE.cv + (LOA_CRED.L1||0) + BASE.auth + (LOA_AUTH.L1||0))         * mk,
+    bank:  (EKYC.T1 + BASE.ci + (LOA_CRED.L2||0))                                        * mk,
+    tax:   (BASE.auth)                                                                     * mk,
+    util:  (BASE.auth)                                                                     * mk,
+    esim:  (EKYC.T1 + BASE.ci + (LOA_CRED.L1||0))                                        * mk,
+  };
+  return +(p[ucType]||calcTotal()*mk).toFixed(3);
+};
+window.getEkycTierRates = function(baseRate){
+  const mk=1+cMgn/100;
+  const a1=+(COSTS.anchor1.cost*mk).toFixed(3);
+  const a2=+(COSTS.anchor2.cost*mk).toFixed(3);
+  return {T1:+baseRate.toFixed(3), T2:+(baseRate+a1).toFixed(3), T3:+(baseRate+a1+a2).toFixed(3)};
+};
+const _origRB=renderBreakdown;
+renderBreakdown=function(){_origRB();if(window.OT_SYNC){OT_SYNC.txPrice=r2(calcTotal()*(1+cMgn/100));OT_SYNC.txCost=r2(calcTotal());}};
+const _origRD=renderDeriv;
+renderDeriv=function(){_origRD();if(window.OT_SYNC){OT_SYNC.txPrice=r2(calcTotal()*(1+cMgn/100));OT_SYNC.txCost=r2(calcTotal());}};
+</script>
+
+</div><!-- /panel-0 -->
+
+<!-- ── Panel 1: eKYC by country ── -->
+<div id="panel-1" role="tabpanel" class="tab-panel">
+<style>
+#panel-1 {
+  --bg:#FAFAFA;--surface:#FFF;--border:#E4E4E7;--border-light:#F0F0F2;
+  --text-primary:#18181B;--text-secondary:#52525B;--text-muted:#A1A1AA;
+  --blue:#2563EB;--blue-light:#EFF6FF;--blue-mid:#DBEAFE;--blue-dark:#1D4ED8;
+  --purple:#7C3AED;--purple-light:#F5F3FF;--purple-mid:#EDE9FE;--purple-dark:#5B21B6;
+  --green:#059669;--green-light:#ECFDF5;--green-mid:#D1FAE5;
+  --amber:#D97706;--amber-light:#FFFBEB;--amber-mid:#FEF3C7;
+  --red:#DC2626;--red-light:#FEF2F2;
+  --teal:#0F766E;--teal-light:#F0FDFA;--teal-mid:#CCFBF1;
+  --gray-light:#F4F4F5;--gray-mid:#E4E4E7;
+  --radius-sm:4px;--radius:6px;--radius-md:8px;--radius-lg:12px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);--shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+}
+#panel-1 * {box-sizing:border-box;margin:0;padding:0}
+#panel-1{margin:0 -24px;min-height:calc(100vh - 50px);}
+#panel-1 {background:var(--bg);color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;line-height:1.5;min-height:100vh}
+#panel-1 .page {max-width:1340px;margin:0 auto;padding:32px 24px 60px}
+#panel-1 .page-header {display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px}
+#panel-1 h1 {font-size:22px;font-weight:600;letter-spacing:-.3px}
+#panel-1 .page-subtitle {font-size:13px;color:var(--text-secondary);margin-top:3px}
+#panel-1 .page-meta {display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#panel-1 .meta-tag {font-size:11px;padding:3px 8px;border-radius:var(--radius-sm);background:var(--gray-light);color:var(--text-secondary);border:1px solid var(--border)}
+#panel-1 .meta-tag.pipeline {background:var(--purple-mid);color:var(--purple-dark);border-color:var(--purple-mid)}
+#panel-1 .meta-tag.working {background:var(--amber-light);color:var(--amber);border-color:var(--amber-mid)}
+#panel-1 .kpi-strip {display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
+#panel-1 .kpi {background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;box-shadow:var(--shadow-sm)}
+#panel-1 .kpi.pipeline-kpi {border-color:var(--purple-mid);background:var(--purple-light)}
+#panel-1 .kpi-label {font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+#panel-1 .kpi-value {font-size:22px;font-weight:600;color:var(--text-primary);letter-spacing:-.5px}
+#panel-1 .kpi.pipeline-kpi .kpi-value {color:var(--purple-dark)}
+#panel-1 .kpi-sub {font-size:11px;color:var(--text-muted);margin-top:3px}
+#panel-1 .kpi.working .kpi-sub {color:var(--amber)}
+#panel-1 .wb-anchor {background:var(--purple-light);border:1px solid var(--purple-mid);border-left:3px solid var(--purple);border-radius:0 var(--radius) var(--radius) 0;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:var(--text-secondary);display:flex;align-items:flex-start;gap:10px}
+#panel-1 .wb-icon {width:18px;height:18px;background:var(--purple);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
+#panel-1 .wb-anchor b {color:var(--text-primary);font-weight:600}
+#panel-1 .wb-anchor a {color:var(--purple);text-decoration:none}
+#panel-1 .wb-anchor a:hover {text-decoration:underline}
+#panel-1 .tier-strip {display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+#panel-1 .tier-item {display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary)}
+#panel-1 .tier-badge {display:inline-block;font-size:11px;padding:2px 8px;border-radius:100px;font-weight:500}
+#panel-1 .tb1 {background:var(--purple-mid);color:var(--purple)}
+#panel-1 .tb2 {background:var(--green-mid);color:var(--green)}
+#panel-1 .tb3 {background:var(--gray-light);color:var(--text-secondary);border:1px solid var(--border)}
+#panel-1 .controls {background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow-sm)}
+#panel-1 .ctrl-row {display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+#panel-1 .ctrl-row+.ctrl-row {margin-top:10px;padding-top:10px;border-top:1px solid var(--border-light)}
+#panel-1 .ctrl-group {display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+#panel-1 .ctrl-label {font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-right:3px;white-space:nowrap}
+#panel-1 .fb {padding:4px 10px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text-secondary);cursor:pointer;transition:all .12s;line-height:1.4}
+#panel-1 .fb:hover {border-color:var(--blue);color:var(--blue)}
+#panel-1 .fb.active {background:var(--blue);border-color:var(--blue);color:#fff;font-weight:500}
+#panel-1 .fb.pipeline-btn {border-color:var(--purple-mid);color:var(--purple)}
+#panel-1 .fb.pipeline-btn:hover {border-color:var(--purple);background:var(--purple-light)}
+#panel-1 .fb.pipeline-btn.active {background:var(--purple);border-color:var(--purple);color:#fff}
+#panel-1 .sort-sel {font-size:12px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text-primary);cursor:pointer}
+#panel-1 .guide-btn {margin-left:auto;font-size:12px;padding:5px 12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text-secondary);cursor:pointer;white-space:nowrap}
+#panel-1 .guide-btn:hover {background:var(--gray-light)}
+#panel-1 .guide-panel {background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:14px;display:none}
+#panel-1 .guide-grid {display:grid;grid-template-columns:1fr 1fr;gap:12px 24px}
+#panel-1 .guide-term {font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:3px}
+#panel-1 .guide-def {font-size:12px;color:var(--text-secondary);line-height:1.6}
+#panel-1 .table-wrap {background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:10px;overflow-x:auto}
+#panel-1 table {width:100%;min-width:1120px;border-collapse:collapse;font-size:12.5px}
+#panel-1 thead {background:var(--gray-light)}
+#panel-1 thead th {font-size:10px;font-weight:600;color:var(--text-muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;letter-spacing:.2px;text-transform:uppercase}
+#panel-1 .th-sub {font-size:10px;color:var(--text-muted);display:block;font-weight:400;text-transform:none;letter-spacing:0;margin-top:1px}
+#panel-1 tbody tr {border-bottom:1px solid var(--border-light);transition:background .1s}
+#panel-1 tbody tr:last-child {border-bottom:none}
+#panel-1 tbody tr:hover {background:#F8FAFF}
+#panel-1 tbody tr.omni-row {border-left:3px solid rgba(124,58,237,.25)}
+#panel-1 tbody tr.omni-row:hover {background:#FAF8FF}
+#panel-1 td {padding:8px 12px;vertical-align:middle}
+#panel-1 .country-cell {display:flex;align-items:center;gap:7px}
+#panel-1 .flag {font-size:17px;line-height:1;flex-shrink:0}
+#panel-1 .country-name {font-weight:600;color:var(--text-primary);white-space:nowrap}
+#panel-1 .omni-dot {display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-left:2px}
+#panel-1 .reg-badge {display:inline-block;font-size:10px;padding:2px 7px;border-radius:100px;white-space:nowrap;font-weight:500}
+#panel-1 .reg-Africa {background:#ECFDF5;color:#047857}
+#panel-1 .reg-MENA {background:#FFFBEB;color:#92400E}
+#panel-1 .reg-SA {background:var(--purple-light);color:#5B21B6}
+#panel-1 .reg-SEA {background:#FFF7ED;color:#9A3412}
+#panel-1 .reg-Americas {background:#FFF1F2;color:#9F1239}
+#panel-1 .reg-Pacific {background:#F0F9FF;color:#0369A1}
+#panel-1 .rail-badge {display:inline-block;font-size:10px;padding:2px 7px;border-radius:100px;white-space:nowrap;font-weight:500;margin-bottom:3px}
+#panel-1 .rail-yes {background:var(--purple-mid);color:var(--purple)}
+#panel-1 .rail-partial {background:var(--amber-mid);color:var(--amber)}
+#panel-1 .rail-nascent {background:#FEE2E2;color:var(--red)}
+#panel-1 .rail-none {background:var(--gray-light);color:var(--text-muted);border:1px solid var(--border)}
+#panel-1 .rail-name {font-size:10px;color:var(--text-muted);line-height:1.3;max-width:155px}
+#panel-1 .cov-cell {min-width:72px}
+#panel-1 .cov-pct {font-size:12px;color:var(--text-secondary)}
+#panel-1 .cov-bar-bg {height:4px;background:var(--gray-mid);border-radius:2px;margin-top:4px;width:64px;overflow:hidden}
+#panel-1 .cov-bar-fill {height:100%;border-radius:2px;background:var(--blue)}
+#panel-1 .stars-cell {color:#D97706;font-size:12px;letter-spacing:1px;white-space:nowrap}
+#panel-1 .vol-badge {display:inline-block;font-size:10px;padding:2px 8px;border-radius:100px;font-weight:600}
+#panel-1 .vol-L {background:var(--blue-mid);color:var(--blue-dark)}
+#panel-1 .vol-M {background:var(--green-mid);color:var(--green)}
+#panel-1 .vol-S {background:var(--gray-light);color:var(--text-secondary);border:1px solid var(--border)}
+#panel-1 .bench-mid {font-size:13px;font-weight:600;color:var(--text-primary)}
+#panel-1 .bench-range {font-size:11px;color:var(--text-muted);white-space:nowrap;margin-top:2px}
+#panel-1 .ot-rate {font-size:13px;font-weight:600;color:var(--blue)}
+#panel-1 .ot-cost {font-size:11px;color:var(--amber);margin-top:2px}
+#panel-1 .savings-badge {display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:100px}
+#panel-1 .sv-high {background:var(--green-light);color:var(--green);border:1px solid var(--green-mid)}
+#panel-1 .sv-mid {background:var(--amber-light);color:var(--amber);border:1px solid var(--amber-mid)}
+#panel-1 .sv-low {background:var(--red-light);color:var(--red);border:1px solid #FECACA}
+#panel-1 .margin-badge {display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:100px;background:var(--purple-light);color:var(--purple);border:1px solid var(--purple-mid)}
+#panel-1 .dpi-circle {width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+#panel-1 .dpi-5 {background:#CCFBF1;color:#0F766E}
+#panel-1 .dpi-4 {background:#DCFCE7;color:#15803D}
+#panel-1 .dpi-3 {background:#FEF9C3;color:#854D0E}
+#panel-1 .dpi-2 {background:#FFEDD5;color:#9A3412}
+#panel-1 .dpi-1 {background:#FEE2E2;color:#991B1B}
+#panel-1 .src-pills {display:flex;flex-direction:column;gap:3px}
+#panel-1 .src-pill {display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;white-space:nowrap}
+#panel-1 .src-t1 {background:var(--purple-mid);color:var(--purple)}
+#panel-1 .src-t2 {background:var(--green-mid);color:var(--green)}
+#panel-1 .src-t3 {background:var(--gray-light);color:var(--text-muted);border:1px solid var(--border)}
+#panel-1 .table-footer {display:flex;justify-content:space-between;align-items:center;padding:0 0 14px;flex-wrap:wrap;gap:8px}
+#panel-1 .table-count {font-size:12px;color:var(--text-muted)}
+#panel-1 .working-note {font-size:11px;color:var(--amber)}
+#panel-1 .sources-section {background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)}
+#panel-1 .sources-toggle {width:100%;text-align:left;padding:14px 18px;font-size:13px;font-weight:600;color:var(--text-secondary);background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+#panel-1 .sources-toggle:hover {background:var(--gray-light)}
+#panel-1 .sources-body {display:none;padding:0 18px 18px}
+#panel-1 .meth-box {background:var(--gray-light);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px;border:1px solid var(--border)}
+#panel-1 .meth-box b {color:var(--text-primary)}
+#panel-1 .src-group {margin-bottom:14px}
+#panel-1 .src-group-title {font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border-light)}
+#panel-1 .src-entry {font-size:12px;color:var(--text-secondary);line-height:1.6;margin-bottom:5px;padding-left:20px;text-indent:-20px}
+#panel-1 .src-entry b {color:var(--purple);font-weight:600}
+#panel-1 .src-entry a {color:var(--blue);text-decoration:none}
+#panel-1 .src-entry a:hover {text-decoration:underline}
+@media(max-width:768px) {
+#panel-1 .kpi-strip {grid-template-columns:1fr 1fr}
+#panel-1 .guide-grid {grid-template-columns:1fr}
+#panel-1 .page {padding:20px 16px 40px}
+
+}
+
+</style>
+<div class="ekyc-page">
+<div class="page">
+
+<div class="page-header">
+  <div>
+    <h1>eKYC Pricing Matrix</h1>
+    <p class="page-subtitle">Commercial benchmarks, OmniTrust anchor rates, and DPI applicability scores — 34 markets, 19 OmniTrust pipeline</p>
+  </div>
+  <div class="page-meta">
+    <span class="meta-tag pipeline">19 OmniTrust pipeline</span>
+    <span class="meta-tag">15 benchmark only</span>
+    <span class="meta-tag">34 markets total</span>
+    <span class="meta-tag working">OT costs = working numbers</span>
+    <span class="meta-tag">Gov't rail: pending update</span>
+  </div>
+</div>
+
+<div class="kpi-strip">
+  <div class="kpi pipeline-kpi"><div class="kpi-label">Pipeline markets</div><div class="kpi-value" id="kpiP">19</div><div class="kpi-sub">OmniTrust active pipeline</div></div>
+  <div class="kpi"><div class="kpi-label">Avg commercial benchmark</div><div class="kpi-value" id="kpi0">—</div><div class="kpi-sub">$/check · 1K–10K vol/mo</div></div>
+  <div class="kpi"><div class="kpi-label">Avg OmniTrust rate</div><div class="kpi-value" id="kpi1">—</div><div class="kpi-sub">$/check · DPI-scale contract</div></div>
+  <div class="kpi"><div class="kpi-label">Avg client savings</div><div class="kpi-value" id="kpi2">—</div><div class="kpi-sub">vs. commercial benchmark</div></div>
+  <div class="kpi working"><div class="kpi-label">Avg OT gross margin</div><div class="kpi-value" id="kpi3">—</div><div class="kpi-sub">* working number</div></div>
+</div>
+
+<div class="wb-anchor">
+  <div class="wb-icon">WB</div>
+  <div><b>World Bank anchor reference [WB-A] — title to be confirmed:</b>
+  openknowledge.worldbank.org/entities/publication/636ca4f8-7c6d-4228-adee-03b36aa345e2
+  &nbsp;<a href="https://openknowledge.worldbank.org/entities/publication/636ca4f8-7c6d-4228-adee-03b36aa345e2" target="_blank">Open ↗</a>.
+  Applied as primary institutional benchmark for ID system costing. Supersedes Tier 3 commercial figures where it provides specific market data.</div>
+</div>
+
+<div class="tier-strip">
+  <div class="tier-item"><span class="tier-badge tb1">Tier 1</span> World Bank / Multilateral (ID4D, GSMA, CGD)</div>
+  <div class="tier-item"><span class="tier-badge tb2">Tier 2</span> Regulatory / National authority</div>
+  <div class="tier-item"><span class="tier-badge tb3">Tier 3</span> Commercial provider rate cards</div>
+</div>
+
+<div class="controls">
+  <div class="ctrl-row">
+    <div class="ctrl-group">
+      <span class="ctrl-label">View</span>
+      <button class="fb active" data-omni="all">All 34 markets</button>
+      <button class="fb pipeline-btn" data-omni="pipeline">&#9679; OmniTrust pipeline only</button>
+    </div>
+    <div class="ctrl-group" style="margin-left:auto">
+      <span class="ctrl-label">Sort</span>
+      <select class="sort-sel" id="sortSel">
+        <option value="dpi-desc">DPI score ↓</option>
+        <option value="savings-desc">Client savings ↓</option>
+        <option value="bench-desc">Benchmark ↓</option>
+        <option value="margin-desc">OT margin ↓</option>
+        <option value="country">Country A–Z</option>
+      </select>
+    </div>
+    <button class="guide-btn" onclick="toggleGuide()">Framework guide ↕</button>
+  </div>
+  <div class="ctrl-row">
+    <div class="ctrl-group">
+      <span class="ctrl-label">Region</span>
+      <button class="fb active" data-r="all">All</button>
+      <button class="fb" data-r="Africa">Africa</button>
+      <button class="fb" data-r="MENA">MENA</button>
+      <button class="fb" data-r="S. Asia">S. Asia</button>
+      <button class="fb" data-r="SE Asia">SE Asia</button>
+      <button class="fb" data-r="Americas">Americas</button>
+      <button class="fb" data-r="Pacific">Pacific</button>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">Gov't rail</span>
+      <button class="fb active" data-rl="all">All</button>
+      <button class="fb" data-rl="yes">Mature</button>
+      <button class="fb" data-rl="partial">Partial</button>
+      <button class="fb" data-rl="nascent">Nascent</button>
+      <button class="fb" data-rl="none">None</button>
+    </div>
+  </div>
+</div>
+
+<div class="guide-panel" id="guidePanel">
+  <div class="guide-grid">
+    <div><div class="guide-term">Commercial benchmark</div><div class="guide-def">Median Tier 3 provider rate (doc + biometric liveness) at 1K–10K checks/month. Cross-validated against World Bank ID4D costing figures (Tier 1) where published. Mid-point of published range is the reference value.</div></div>
+    <div><div class="guide-term">OmniTrust rate</div><div class="guide-def">Proposed client-facing price in a DPI contract. Targets 45–60% savings vs. benchmark, enabled by multi-country volume aggregation and gov't rail integration where available.</div></div>
+    <div><div class="guide-term">OmniTrust cost *</div><div class="guide-def">Working number. Blended provider/API cost at DPI-scale (100K+/month). Cross-reference with OmniTrust Costs page before IRR or DCF modelling. Do not treat as final.</div></div>
+    <div><div class="guide-term">Client savings</div><div class="guide-def">(Benchmark mid – OT Rate) ÷ Benchmark mid. Green = 50%+, amber = 35–49%, red = below 35%.</div></div>
+    <div><div class="guide-term">OT margin *</div><div class="guide-def">(OT Rate – OT Cost) ÷ OT Rate. Target 50–60% gross on eKYC service line. Working number pending costs page finalisation.</div></div>
+    <div><div class="guide-term">DPI score (1–5)</div><div class="guide-def">Composite: market volume 35%, gov't rail opportunity 30%, savings gap 20%, regulatory clarity 15%. Nascent-rail markets score highest. Purple dot = OmniTrust pipeline.</div></div>
+  </div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead><tr>
+  <th>Country</th><th>Region</th>
+  <th>Gov't rail <span class="th-sub">Status · system name</span></th>
+  <th>ID coverage <span class="th-sub">% adults enrolled</span></th>
+  <th>Reg clarity <span class="th-sub">eKYC legal framework</span></th>
+  <th>Market vol <span class="th-sub">eKYC demand tier</span></th>
+  <th>Commercial benchmark <span class="th-sub">$/check · 1K–10K/mo</span></th>
+  <th>OmniTrust rate <span class="th-sub">$/check · DPI contract</span></th>
+  <th>Client savings</th>
+  <th>OT margin <span class="th-sub">* working number</span></th>
+  <th>DPI score</th>
+  <th>Sources</th>
+</tr></thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+
+<div class="table-footer">
+  <div class="table-count" id="tableCount"></div>
+  <div class="working-note">* OmniTrust cost and margin = working numbers. Cross-reference OmniTrust Costs page before financial modelling.</div>
+</div>
+
+<div class="sources-section">
+  <button class="sources-toggle" onclick="toggleSources()">
+    <span>Sources &amp; methodology</span><span id="srcArrow">▼</span>
+  </button>
+  <div class="sources-body" id="sourcesBody">
+    <div class="meth-box">
+      <b>What the benchmarked $/check figures cover:</b> The commercial rates shown (e.g. $1.5–$4.5/check for Nigeria, $2.5–$6.5/check for Ethiopia) reflect the market price charged by providers such as Sumsub, Smile Identity, Jumio, Onfido, Trulioo, and Shufti Pro for a <b>standard identity verification bundle</b> at 1K–10K checks/month. A single billable "check" at <b>Tier 1 (T1)</b> typically comprises: <b>document capture &amp; OCR</b> (MRZ/data-field extraction from a government-issued ID); <b>passive liveness detection</b> (ISO 30107-3 Level 1/2 — confirming a live face, not a photo or replay); <b>1:1 face match</b> (biometric comparison of live selfie against the document portrait); and a <b>basic sanctions/watchlist screen</b>. Higher-volume contracts reduce the per-check rate by 30–60%. OmniTrust's <b>Tier 2 (T2)</b> rate adds a <b>data anchor query</b> — a real-time API call to a national civil registry or credit bureau to cross-validate name, DOB, and ID number; this is reflected in the T2 premium applied in the Tab 3 volume model. <b>Tier 3 (T3)</b> adds a <b>second data anchor</b> (e.g. telco subscriber records) for markets where no single authoritative registry exists. The OmniTrust rate targets 45–60% below the T1 commercial benchmark through multi-country volume aggregation and, where a gov't rail is available, direct API integration that bypasses commercial intermediaries.<br><br>
+      <b>Pricing methodology:</b> Commercial benchmark sourced from Tier 3 provider rate cards (Sumsub, Smile Identity, Jumio, Onfido, Trulioo, Shufti Pro) at 1K–10K checks/month as of Q1 2025, cross-validated against Tier 1 World Bank ID4D costing studies. The World Bank anchor publication [WB-A] is the primary institutional benchmark once its title is confirmed. OmniTrust rate modelled at 45–60% discount to benchmark midpoint. OmniTrust cost is a working number only.<br><br>
+      <b>Gov't rail classification:</b> <em>Mature</em> = API-accessible, enrollment &gt;80%; <em>Partial</em> = national ID exists, limited API or sub-80% coverage; <em>Nascent</em> = digital ID program under 3 years old; <em>None</em> = no national digital ID for eKYC purposes.
+    </div>
+    <div id="sourcesList"></div>
+  </div>
+</div>
+
+</div><!-- /page -->
+</div><!-- /ekyc-page -->
+<script>
+
+(function(){
+const DATA=[
+  {country:'Ethiopia',flag:'🇪🇹',region:'Africa',rl:'nascent',rln:'Fayda NIDP (TECH5, est. 2022)',cov:25,rc:2,vol:'L',blo:2.5,bhi:6.5,otr:1.95,otc:0.88,dpi:4.8,omni:true,src:[{t:1,l:'WB-A',r:'WBA'},{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'NIDP Ethiopia',r:'R4'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Nigeria',flag:'🇳🇬',region:'Africa',rl:'partial',rln:'NIMC NIN + CBN BVN',cov:55,rc:3,vol:'L',blo:1.5,bhi:4.5,otr:1.35,otc:0.62,dpi:4.5,omni:false,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'CBN circ.',r:'R1'},{t:3,l:'Smile Identity',r:'C1'}]},
+  {country:'Bangladesh',flag:'🇧🇩',region:'S. Asia',rl:'partial',rln:'Smart NID (EC) + BB eKYC',cov:65,rc:3,vol:'L',blo:1.0,bhi:3.0,otr:0.92,otc:0.42,dpi:4.2,omni:false,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'Bangladesh Bank',r:'R13'},{t:3,l:'Shufti Pro',r:'C6'}]},
+  {country:'Indonesia',flag:'🇮🇩',region:'SE Asia',rl:'partial',rln:'Dukcapil eKYC (Kemendagri)',cov:78,rc:3,vol:'L',blo:0.8,bhi:3.0,otr:0.88,otc:0.38,dpi:4.2,omni:true,src:[{t:1,l:'GSMA',r:'WB3'},{t:2,l:'OJK reg.',r:'R9'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Kenya',flag:'🇰🇪',region:'Africa',rl:'partial',rln:'Huduma Namba + eCitizen',cov:62,rc:3,vol:'M',blo:1.0,bhi:3.5,otr:1.05,otc:0.48,dpi:4.0,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'CA Kenya',r:'R2'},{t:3,l:'Smile Identity',r:'C1'}]},
+  {country:'Egypt',flag:'🇪🇬',region:'Africa',rl:'yes',rln:'National ID (CAPMAS) + CBE',cov:75,rc:3,vol:'L',blo:1.5,bhi:4.0,otr:1.28,otc:0.58,dpi:3.8,omni:false,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'CBE 2022',r:'R5'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Pakistan',flag:'🇵🇰',region:'S. Asia',rl:'yes',rln:'NADRA Verisys API',cov:68,rc:3,vol:'L',blo:1.0,bhi:3.5,otr:1.02,otc:0.46,dpi:3.8,omni:false,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'NADRA catalog',r:'R14'},{t:3,l:'Trulioo',r:'C5'}]},
+  {country:'Philippines',flag:'🇵🇭',region:'SE Asia',rl:'partial',rln:'PhilSys (PSA, RA 11055)',cov:55,rc:3,vol:'M',blo:0.5,bhi:2.5,otr:0.72,otc:0.32,dpi:3.7,omni:false,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'BSP Circular',r:'R10'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Rwanda',flag:'🇷🇼',region:'Africa',rl:'yes',rln:'Irembo + Rwanda NID',cov:78,rc:4,vol:'S',blo:2.5,bhi:5.5,otr:1.80,otc:0.82,dpi:3.6,omni:false,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'RURA 2023',r:'R6'},{t:3,l:'Smile Identity',r:'C1'}]},
+  {country:'Vietnam',flag:'🇻🇳',region:'SE Asia',rl:'partial',rln:'CCCD (MPS) + SBV eKYC',cov:72,rc:3,vol:'M',blo:1.0,bhi:3.5,otr:1.02,otc:0.46,dpi:3.5,omni:false,src:[{t:1,l:'GSMA',r:'WB3'},{t:2,l:'SBV Circular',r:'R11'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'India',flag:'🇮🇳',region:'S. Asia',rl:'yes',rln:'Aadhaar eKYC (UIDAI)',cov:92,rc:4,vol:'L',blo:0.10,bhi:1.5,otr:0.32,otc:0.10,dpi:3.5,omni:false,src:[{t:1,l:'WB-A',r:'WBA'},{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'UIDAI',r:'R15'},{t:3,l:'iSPIRT',r:'C7'}]},
+  {country:'Tanzania',flag:'🇹🇿',region:'Africa',rl:'partial',rln:'NIDA (National ID Authority)',cov:45,rc:2,vol:'M',blo:2.0,bhi:5.0,otr:1.62,otc:0.74,dpi:3.5,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'BoT 2021',r:'R7'},{t:3,l:'Smile Identity',r:'C1'}]},
+  {country:'Ghana',flag:'🇬🇭',region:'Africa',rl:'partial',rln:'Ghana Card (NIA) + GH-Link',cov:60,rc:3,vol:'M',blo:2.0,bhi:5.0,otr:1.62,otc:0.74,dpi:3.3,omni:false,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'NIA Ghana',r:'R3'},{t:3,l:'Smile Identity',r:'C1'}]},
+  {country:'South Africa',flag:'🇿🇦',region:'Africa',rl:'yes',rln:'HANIS (DHA) + FICA',cov:82,rc:4,vol:'M',blo:0.8,bhi:2.5,otr:0.82,otc:0.36,dpi:3.2,omni:false,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'FICA Act',r:'R8'},{t:3,l:'Trulioo',r:'C5'}]},
+  {country:'Saudi Arabia',flag:'🇸🇦',region:'MENA',rl:'yes',rln:'ABSHER / Nafath (SDAIA)',cov:92,rc:5,vol:'M',blo:2.5,bhi:6.5,otr:2.18,otc:0.96,dpi:3.2,omni:false,src:[{t:1,l:'WB-A',r:'WBA'},{t:2,l:'SAMA 2022',r:'R16'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Malaysia',flag:'🇲🇾',region:'SE Asia',rl:'yes',rln:'MyKad (JPN) + BNM eKYC',cov:91,rc:4,vol:'M',blo:0.5,bhi:2.0,otr:0.60,otc:0.25,dpi:3.0,omni:false,src:[{t:1,l:'GSMA',r:'WB3'},{t:2,l:'BNM 2020',r:'R12'},{t:3,l:'Veriff',r:'C3'}]},
+  {country:'Zambia',flag:'🇿🇲',region:'Africa',rl:'none',rln:'None (NRC paper-based)',cov:35,rc:2,vol:'S',blo:2.5,bhi:6.0,otr:1.88,otc:0.86,dpi:3.0,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'BoZ NPS',r:'R17'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Jordan',flag:'🇯🇴',region:'MENA',rl:'partial',rln:'National ID + CBJ framework',cov:85,rc:3,vol:'S',blo:2.0,bhi:5.0,otr:1.62,otc:0.74,dpi:2.8,omni:false,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'CBJ 2020',r:'R18'},{t:3,l:'Shufti Pro',r:'C6'}]},
+  {country:'UAE',flag:'🇦🇪',region:'MENA',rl:'yes',rln:'UAE Pass (TRA)',cov:95,rc:5,vol:'S',blo:3.0,bhi:8.0,otr:2.75,otc:1.20,dpi:2.5,omni:false,src:[{t:1,l:'WB-A',r:'WBA'},{t:2,l:'TRA 2023',r:'R19'},{t:3,l:'Jumio',r:'C2'}]},
+  {country:'Mozambique',flag:'🇲🇿',region:'Africa',rl:'none',rln:'None (civil registry only)',cov:20,rc:1,vol:'S',blo:3.0,bhi:7.0,otr:2.20,otc:1.00,dpi:2.5,omni:false,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'BM 2022',r:'R20'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Somalia',flag:'🇸🇴',region:'Africa',rl:'nascent',rln:'CBS pilot national ID (limited)',cov:18,rc:1,vol:'M',blo:3.5,bhi:8.0,otr:2.38,otc:1.06,dpi:4.2,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'CBS Somalia',r:'R23'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Uganda',flag:'🇺🇬',region:'Africa',rl:'partial',rln:'NIRA national ID',cov:55,rc:3,vol:'M',blo:1.5,bhi:4.5,otr:1.40,otc:0.64,dpi:4.0,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'Bank of Uganda',r:'R32'},{t:3,l:'Smile Identity',r:'C1'}]},
+  {country:'Senegal',flag:'🇸🇳',region:'Africa',rl:'partial',rln:'CNIE + BCEAO eKYC',cov:60,rc:3,vol:'M',blo:2.0,bhi:5.0,otr:1.55,otc:0.70,dpi:3.5,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'BCEAO',r:'R26'},{t:3,l:'Smile Identity',r:'C1'}]},
+  {country:'Colombia',flag:'🇨🇴',region:'Americas',rl:'partial',rln:'Cédula + SFC eKYC',cov:78,rc:3,vol:'M',blo:1.0,bhi:3.5,otr:1.05,otc:0.48,dpi:3.5,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'SFC Colombia',r:'R22'},{t:3,l:'Trulioo',r:'C5'}]},
+  {country:'Peru',flag:'🇵🇪',region:'Americas',rl:'partial',rln:'DNI + SBS eKYC',cov:82,rc:3,vol:'M',blo:1.0,bhi:3.5,otr:1.05,otc:0.48,dpi:3.3,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'SBS Peru',r:'R33'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Papua New Guinea',flag:'🇵🇬',region:'Pacific',rl:'none',rln:'None (basic civil registry)',cov:35,rc:1,vol:'S',blo:3.0,bhi:7.0,otr:2.10,otc:0.95,dpi:3.2,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'BPNG',r:'R21'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Botswana',flag:'🇧🇼',region:'Africa',rl:'partial',rln:'Omang national ID',cov:80,rc:3,vol:'S',blo:2.0,bhi:4.5,otr:1.42,otc:0.65,dpi:2.8,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'NBFIRA',r:'R27'},{t:3,l:'Smile Identity',r:'C1'}]},
+  {country:'Mauritius',flag:'🇲🇺',region:'Africa',rl:'yes',rln:'National ID + FSC eKYC',cov:95,rc:4,vol:'S',blo:1.5,bhi:3.5,otr:1.12,otc:0.50,dpi:2.8,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'FSC Mauritius',r:'R29'},{t:3,l:'Trulioo',r:'C5'}]},
+  {country:'Timor-Leste',flag:'🇹🇱',region:'SE Asia',rl:'none',rln:'None (nascent civil registry)',cov:25,rc:1,vol:'S',blo:3.5,bhi:8.0,otr:2.40,otc:1.08,dpi:2.8,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'BCTL',r:'R34'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Honduras',flag:'🇭🇳',region:'Americas',rl:'partial',rln:'RNP national ID',cov:72,rc:2,vol:'S',blo:1.5,bhi:4.0,otr:1.20,otc:0.55,dpi:2.8,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'CNBS',r:'R24'},{t:3,l:'Shufti Pro',r:'C6'}]},
+  {country:'Guatemala',flag:'🇬🇹',region:'Americas',rl:'partial',rln:'RENAP DPI national ID',cov:70,rc:2,vol:'S',blo:1.5,bhi:4.0,otr:1.20,otc:0.55,dpi:2.9,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'SIB Guatemala',r:'R25'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Djibouti',flag:'🇩🇯',region:'Africa',rl:'none',rln:'None (civil registry only)',cov:40,rc:2,vol:'S',blo:3.0,bhi:7.0,otr:2.10,otc:0.95,dpi:2.5,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'BCD',r:'R28'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Fiji',flag:'🇫🇯',region:'Pacific',rl:'partial',rln:'Vuvale ID + RBF eKYC',cov:65,rc:2,vol:'S',blo:2.5,bhi:6.0,otr:1.85,otc:0.84,dpi:2.3,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'RBF Fiji',r:'R30'},{t:3,l:'Sumsub',r:'C4'}]},
+  {country:'Comoros',flag:'🇰🇲',region:'Africa',rl:'none',rln:'None (civil registry only)',cov:30,rc:1,vol:'S',blo:4.0,bhi:8.0,otr:2.60,otc:1.18,dpi:2.0,omni:true,src:[{t:1,l:'WB ID4D',r:'WB1'},{t:2,l:'BCC',r:'R31'},{t:3,l:'Sumsub',r:'C4'}]},
+];
+
+const ALL_SOURCES={
+  'WBA':{tier:1,text:'[WB-A] World Bank Open Knowledge — title to be confirmed. <a href="https://openknowledge.worldbank.org/entities/publication/636ca4f8-7c6d-4228-adee-03b36aa345e2" target="_blank">openknowledge.worldbank.org/...</a>'},
+  'WB1':{tier:1,text:'[WB1] World Bank ID4D Global Dataset 2023. Washington DC: World Bank Group.'},
+  'WB2':{tier:1,text:'[WB2] Gelb & Metz (2018). Identification Revolution. Center for Global Development / World Bank.'},
+  'WB3':{tier:1,text:'[WB3] GSMA Digital Identity Programme (2024). The State of Mobile Digital Identity. London: GSMA.'},
+  'WB4':{tier:1,text:'[WB4] World Bank (2021). Practitioner\'s Guide: Legal and Regulatory Frameworks for Interoperable and Inclusive ID Systems.'},
+  'R1':{tier:2,text:'[R1] Central Bank of Nigeria. eKYC Regulatory Framework and Guidelines, 2023.'},
+  'R2':{tier:2,text:'[R2] Communications Authority Kenya. Digital Identity and eKYC Policy, 2023.'},
+  'R3':{tier:2,text:'[R3] Ghana National Identification Authority. Annual Report 2023.'},
+  'R4':{tier:2,text:'[R4] National ID Program (NIDP) Ethiopia. Fayda Program Documentation 2022–23.'},
+  'R5':{tier:2,text:'[R5] Central Bank of Egypt. eKYC Regulatory Circular, 2022.'},
+  'R6':{tier:2,text:'[R6] Rwanda Utilities Regulatory Authority. Digital Services Annual Report 2023.'},
+  'R7':{tier:2,text:'[R7] Bank of Tanzania. National Payment System eKYC Framework, 2021.'},
+  'R8':{tier:2,text:'[R8] Republic of South Africa. Financial Intelligence Centre Act 28 of 2001 (as amended 2017).'},
+  'R9':{tier:2,text:'[R9] Otoritas Jasa Keuangan (OJK). Regulation POJK No. 12/POJK.03/2021.'},
+  'R10':{tier:2,text:'[R10] Bangko Sentral ng Pilipinas. BSP Circular 1022: Guidelines on Digital Onboarding, 2021.'},
+  'R11':{tier:2,text:'[R11] State Bank of Vietnam. Circular 16/2020/TT-NHNN on eKYC.'},
+  'R12':{tier:2,text:'[R12] Bank Negara Malaysia. Policy Document: Electronic Know-Your-Customer (eKYC), 2020.'},
+  'R13':{tier:2,text:'[R13] Bangladesh Bank. BRPD Circular No. 14 (2021): eKYC for Account Opening.'},
+  'R14':{tier:2,text:'[R14] NADRA. Verisys API Service Catalog 2023.'},
+  'R15':{tier:2,text:'[R15] UIDAI. Annual Report 2023–24.'},
+  'R16':{tier:2,text:'[R16] SAMA. eKYC Framework for Financial Institutions, 2022.'},
+  'R17':{tier:2,text:'[R17] Bank of Zambia. National Payment Systems Oversight Report, 2023.'},
+  'R18':{tier:2,text:'[R18] Central Bank of Jordan. Payment Systems Regulations, 2020.'},
+  'R19':{tier:2,text:'[R19] TRA UAE. UAE Pass Technical Documentation, 2023.'},
+  'R20':{tier:2,text:'[R20] Banco de Moçambique. Digital Finance and Payment Systems Roadmap, 2022.'},
+  'R21':{tier:2,text:'[R21] Bank of Papua New Guinea. Digital Finance Framework and eKYC Guidelines, 2022.'},
+  'R22':{tier:2,text:'[R22] Superintendencia Financiera de Colombia. Circular Básica Jurídica — eKYC, 2022.'},
+  'R23':{tier:2,text:'[R23] Central Bank of Somalia. Financial Inclusion and eKYC Pilot Framework, 2023.'},
+  'R24':{tier:2,text:'[R24] CNBS Honduras. Circular sobre KYC Digital, 2022.'},
+  'R25':{tier:2,text:'[R25] SIB Guatemala. Reglamento eKYC, 2022.'},
+  'R26':{tier:2,text:'[R26] BCEAO. Instruction sur l\'e-KYC, 2021.'},
+  'R27':{tier:2,text:'[R27] NBFIRA Botswana. Digital Onboarding Guidelines, 2023.'},
+  'R28':{tier:2,text:'[R28] Banque Centrale de Djibouti. Cadre de réglementation financière numérique, 2022.'},
+  'R29':{tier:2,text:'[R29] FSC Mauritius. KYC/CDD Guidelines for Digital Onboarding, 2022.'},
+  'R30':{tier:2,text:'[R30] Reserve Bank of Fiji. Guideline on Electronic Know Your Customer (eKYC), 2022.'},
+  'R31':{tier:2,text:'[R31] Banque Centrale des Comores. Cadre de réglementation des services financiers numériques, 2022.'},
+  'R32':{tier:2,text:'[R32] Bank of Uganda. Mobile Money Guidelines and KYC Framework, 2020 (revised 2023).'},
+  'R33':{tier:2,text:'[R33] SBS Peru. Reglamento de Gestión del Riesgo de LA/FT y eKYC, 2022.'},
+  'R34':{tier:2,text:'[R34] BCTL. Financial System Stability Review and Digital Finance Framework, 2022.'},
+  'C1':{tier:3,text:'[C1] Smile Identity (2024). Africa Identity Verification Benchmark Report Q1 2024.'},
+  'C2':{tier:3,text:'[C2] Jumio (2024). MENA Region Identity Verification Pricing Guide 2024.'},
+  'C3':{tier:3,text:'[C3] Veriff (2024). Southeast Asia Identity Verification Market Report 2024.'},
+  'C4':{tier:3,text:'[C4] Sumsub (2024). Global eKYC Benchmark and Pricing Report 2024.'},
+  'C5':{tier:3,text:'[C5] Trulioo (2024). Global Identity Verification Pricing 2024.'},
+  'C6':{tier:3,text:'[C6] Shufti Pro (2024). MENA and South Asia eKYC Pricing Documentation 2024.'},
+  'C7':{tier:3,text:'[C7] iSPIRT Foundation (2024). IndiaStack — Aadhaar eKYC Integration Guide.'},
+};
+
+const regCls={Africa:'reg-Africa',MENA:'reg-MENA','S. Asia':'reg-SA','SE Asia':'reg-SEA',Americas:'reg-Americas',Pacific:'reg-Pacific'};
+const rlCls={yes:'rail-yes',partial:'rail-partial',nascent:'rail-nascent',none:'rail-none'};
+const rlLbl={yes:'Mature',partial:'Partial',nascent:'Nascent',none:'None'};
+const tcls={1:'src-t1',2:'src-t2',3:'src-t3'};
+
+function stars(n){const r=Math.round(n);return '★'.repeat(r)+'<span style="opacity:.2">'+'★'.repeat(5-r)+'</span>';}
+function dcls(s){return s>=4.5?'dpi-5':s>=3.8?'dpi-4':s>=3.0?'dpi-3':s>=2.0?'dpi-2':'dpi-1';}
+function svcls(p){return p>=50?'sv-high':p>=35?'sv-mid':'sv-low';}
+
+let rF='all',rlF='all',omniF='all',srtMode='dpi-desc';
+
+function ekycRender(){
+  let rows=DATA.filter(d=>(rF==='all'||d.region===rF)&&(rlF==='all'||d.rl===rlF)&&(omniF==='all'||d.omni===true));
+  const sf={'dpi-desc':(a,b)=>b.dpi-a.dpi,'savings-desc':(a,b)=>{const sa=((a.blo+a.bhi)/2-a.otr)/((a.blo+a.bhi)/2);const sb=((b.blo+b.bhi)/2-b.otr)/((b.blo+b.bhi)/2);return sb-sa;},'bench-desc':(a,b)=>((b.blo+b.bhi)/2)-((a.blo+a.bhi)/2),'margin-desc':(a,b)=>((b.otr-b.otc)/b.otr)-((a.otr-a.otc)/a.otr),'country':(a,b)=>a.country.localeCompare(b.country)};
+  rows.sort(sf[srtMode]);
+  const usedRefs=new Set();
+  const pipelineCount=rows.filter(d=>d.omni).length;
+  document.getElementById('tableBody').innerHTML=rows.map(d=>{
+    const mid=+((d.blo+d.bhi)/2).toFixed(2);
+    const sv=Math.round((mid-d.otr)/mid*100);
+    const mg=Math.round((d.otr-d.otc)/d.otr*100);
+    const uniqueSrc=[...new Map(d.src.map(s=>[s.r,s])).values()];
+    uniqueSrc.forEach(s=>usedRefs.add(s.r));
+    const pills=uniqueSrc.map(s=>`<span class="src-pill ${tcls[s.t]}">${s.l}</span>`).join('');
+    const omniDot=d.omni?'<span class="omni-dot" title="OmniTrust pipeline"></span>':'';
+    return `<tr class="${d.omni?'omni-row':''}" style="cursor:${d.omni?'pointer':'default'}" onclick="${d.omni?`if(window.OT_SYNC){OT_SYNC.country='${d.country}';OT_SYNC.otr=${d.otr};}`:''}">
+      <td><div class="country-cell"><span class="flag">${d.flag}</span><span class="country-name">${d.country}</span>${omniDot}</div></td>
+      <td><span class="reg-badge ${regCls[d.region]}">${d.region}</span></td>
+      <td><div><span class="rail-badge ${rlCls[d.rl]}">${rlLbl[d.rl]}</span><div class="rail-name">${d.rln}</div></div></td>
+      <td><div class="cov-cell"><div class="cov-pct">${d.cov}%</div><div class="cov-bar-bg"><div class="cov-bar-fill" style="width:${d.cov}%"></div></div></div></td>
+      <td><span class="stars-cell">${stars(d.rc)}</span></td>
+      <td><span class="vol-badge vol-${d.vol}">${d.vol==='L'?'Large':d.vol==='M'?'Medium':'Small'}</span></td>
+      <td><div class="bench-mid">$${mid.toFixed(2)}</div><div class="bench-range">$${d.blo.toFixed(2)}–$${d.bhi.toFixed(2)}/check</div></td>
+      <td><div class="ot-rate">$${d.otr.toFixed(2)}</div><div class="ot-cost">cost $${d.otc.toFixed(2)} *</div></td>
+      <td><span class="savings-badge ${svcls(sv)}">${sv}%</span></td>
+      <td><span class="margin-badge">${mg}% *</span></td>
+      <td><div class="dpi-circle ${dcls(d.dpi)}">${d.dpi.toFixed(1)}</div></td>
+      <td><div class="src-pills">${pills}</div></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('tableCount').textContent=`${rows.length} markets shown · ${pipelineCount} pipeline`;
+  document.getElementById('kpiP').textContent=pipelineCount;
+  if(rows.length>0){
+    const ab=rows.reduce((s,d)=>s+(d.blo+d.bhi)/2,0)/rows.length;
+    const ao=rows.reduce((s,d)=>s+d.otr,0)/rows.length;
+    const asv=rows.reduce((s,d)=>{const m=(d.blo+d.bhi)/2;return s+(m-d.otr)/m*100;},0)/rows.length;
+    const amg=rows.reduce((s,d)=>s+(d.otr-d.otc)/d.otr*100,0)/rows.length;
+    document.getElementById('kpi0').textContent='$'+ab.toFixed(2);
+    document.getElementById('kpi1').textContent='$'+ao.toFixed(2);
+    document.getElementById('kpi2').textContent=Math.round(asv)+'%';
+    document.getElementById('kpi3').textContent=Math.round(amg)+'% *';
+  }
+  const wb=Object.keys(ALL_SOURCES).filter(k=>ALL_SOURCES[k].tier===1&&usedRefs.has(k));
+  const rg=Object.keys(ALL_SOURCES).filter(k=>ALL_SOURCES[k].tier===2&&usedRefs.has(k));
+  const cm=Object.keys(ALL_SOURCES).filter(k=>ALL_SOURCES[k].tier===3&&usedRefs.has(k));
+  const mkGrp=(title,refs)=>refs.length===0?'':`<div class="src-group"><div class="src-group-title">${title}</div>${refs.map(r=>`<div class="src-entry"><b>${r}</b> ${ALL_SOURCES[r].text}</div>`).join('')}</div>`;
+  document.getElementById('sourcesList').innerHTML=mkGrp('Tier 1 — World Bank / Multilateral',wb)+mkGrp('Tier 2 — Regulatory / National authority',rg)+mkGrp('Tier 3 — Commercial provider benchmarks',cm);
+}
+
+document.querySelectorAll('#panel-1 [data-omni]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#panel-1 [data-omni]').forEach(x=>x.classList.remove('active'));b.classList.add('active');omniF=b.dataset.omni;ekycRender();}));
+document.querySelectorAll('#panel-1 [data-r]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#panel-1 [data-r]').forEach(x=>x.classList.remove('active'));b.classList.add('active');rF=b.dataset.r;ekycRender();}));
+document.querySelectorAll('#panel-1 [data-rl]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#panel-1 [data-rl]').forEach(x=>x.classList.remove('active'));b.classList.add('active');rlF=b.dataset.rl;ekycRender();}));
+document.getElementById('sortSel').addEventListener('change',e=>{srtMode=e.target.value;ekycRender();});
+function toggleGuide(){const p=document.getElementById('guidePanel');p.style.display=p.style.display==='block'?'none':'block';}
+function toggleSources(){const b=document.getElementById('sourcesBody'),a=document.getElementById('srcArrow'),o=b.style.display==='block';b.style.display=o?'none':'block';a.textContent=o?'▼':'▲';}
+window.toggleGuide=toggleGuide;
+window.toggleSources=toggleSources;
+ekycRender();
+})();
+
+</script>
+</div><!-- /panel-1 -->
+
+<!-- ── Panel 2: Volume & revenue ── -->
+<div id="panel-2" role="tabpanel" class="tab-panel">
+<style>
+#panel-2 {
+  --orange:#F26522;--orange-dim:rgba(242,101,34,0.07);--orange-mid:rgba(242,101,34,0.18);
+  --navy:#1B3A6A;--navy-dim:rgba(27,58,106,0.06);
+  --teal:#006767;--teal-dim:rgba(0,103,103,0.07);
+  --bg:#F0F2F4;--white:#FFFFFF;--line:#DDE2E8;--line-light:#EDF0F3;
+  --text-1:#2C3242;--text-2:#596070;--text-3:#9AAABB;
+  --sans:'Barlow','Calibri','Segoe UI',Arial,sans-serif;
+  --mono:'Consolas','Courier New',monospace;
+}
+#panel-2{margin:0 -24px;min-height:calc(100vh - 50px);}
+#panel-2 {background:var(--bg);color:var(--text-1);font-family:var(--sans);font-size:13.5px;line-height:1.5;}
+#panel-2 .shell {display:flex;height:calc(100vh - 50px);}
+#panel-2 .inp {width:348px;flex-shrink:0;border-right:1px solid var(--line);overflow-y:auto;background:#FAFBFC;}
+#panel-2 .inp::-webkit-scrollbar {width:3px;}
+#panel-2 .inp::-webkit-scrollbar-thumb {background:var(--line);}
+#panel-2 .out {flex:1;overflow-y:auto;padding:20px 26px;background:var(--bg);}
+#panel-2 .out::-webkit-scrollbar {width:3px;}
+#panel-2 .out::-webkit-scrollbar-thumb {background:var(--line);}
+#panel-2 .sec {padding:15px 17px;border-bottom:1px solid var(--line);}
+#panel-2 .sec-lbl {font-size:9.5px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:var(--navy);display:inline-block;margin-bottom:12px;padding-bottom:4px;border-bottom:2px solid var(--orange);}
+#panel-2 .uc-grid {display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+#panel-2 .uc-card {background:var(--white);border:1px solid var(--line);border-left:2px solid transparent;border-radius:3px;padding:9px 10px;cursor:pointer;transition:border-color .12s,background .12s;}
+#panel-2 .uc-card:hover {border-color:var(--line);border-left-color:var(--orange);background:var(--orange-dim);}
+#panel-2 .uc-card.active {border-color:var(--line);border-left:3px solid var(--orange);background:var(--orange-dim);}
+#panel-2 .uc-icon {font-size:15px;line-height:1;margin-bottom:4px;}
+#panel-2 .uc-name {font-size:11px;font-weight:700;color:var(--navy);line-height:1.3;}
+#panel-2 .uc-desc {font-size:9.5px;color:var(--text-2);margin-top:2px;line-height:1.3;}
+#panel-2 .drv {margin-bottom:13px;}
+#panel-2 .drv:last-of-type {margin-bottom:0;}
+#panel-2 .drv-hdr {display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+#panel-2 .drv-name {font-size:12px;color:var(--text-2);font-weight:600;}
+#panel-2 .drv-val {font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--navy);}
+#panel-2 input[type=range] {-webkit-appearance:none;width:100%;height:3px;background:var(--line);border-radius:2px;outline:none;cursor:pointer;}
+#panel-2 input[type=range]::-webkit-slider-thumb {-webkit-appearance:none;width:13px;height:13px;background:var(--navy);border-radius:50%;border:2px solid var(--white);box-shadow:0 1px 4px rgba(27,58,106,0.25);cursor:pointer;}
+#panel-2 input[type=range].oth::-webkit-slider-thumb {background:var(--orange);box-shadow:0 1px 4px rgba(242,101,34,0.3);}
+#panel-2 .range-tks {display:flex;justify-content:space-between;margin-top:3px;}
+#panel-2 .range-tks span {font-size:9px;color:var(--text-3);}
+#panel-2 .computed {background:var(--teal-dim);border:1px solid rgba(0,103,103,0.17);border-radius:3px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:9px;}
+#panel-2 .computed-l {font-size:11px;color:var(--teal);font-weight:700;}
+#panel-2 .computed-v {font-family:var(--mono);font-size:15px;font-weight:700;color:var(--teal);}
+#panel-2 .numinput {display:flex;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:3px;overflow:hidden;}
+#panel-2 .numinput input {background:transparent;border:none;outline:none;color:var(--navy);font-family:var(--mono);font-size:12.5px;font-weight:700;padding:7px 11px;width:100%;}
+#panel-2 .numinput input::-webkit-inner-spin-button {-webkit-appearance:none;}
+#panel-2 .numinput-unit {font-size:9.5px;color:var(--text-3);padding:0 10px 0 0;white-space:nowrap;}
+#panel-2 .rev-row {display:flex;align-items:center;gap:9px;margin-top:4px;}
+#panel-2 .rev-input-wrap {display:flex;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:3px;overflow:hidden;flex:1;}
+#panel-2 .rev-input-wrap input {background:transparent;border:none;outline:none;color:var(--text-2);font-family:var(--mono);font-size:12px;font-weight:600;padding:5px 9px;width:100%;}
+#panel-2 .rev-input-wrap input::-webkit-inner-spin-button {-webkit-appearance:none;}
+#panel-2 .tog-row {display:flex;gap:5px;margin-bottom:12px;}
+#panel-2 .tbtn {flex:1;padding:6px;border:1px solid var(--line);background:var(--white);color:var(--text-2);border-radius:3px;font-size:11px;font-weight:700;cursor:pointer;text-align:center;transition:all .12s;font-family:var(--sans);letter-spacing:0.03em;}
+#panel-2 .tbtn.active {background:var(--navy);border-color:var(--navy);color:#FFF;}
+#panel-2 .tbtn:hover:not(.active) {border-color:var(--navy);color:var(--navy);}
+#panel-2 .spark {background:var(--white);border:1px solid var(--line);border-radius:3px;padding:9px 11px;margin-top:12px;}
+#panel-2 .spark-hdr {display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-bottom:6px;}
+#panel-2 .spark-ann {font-weight:700;color:var(--navy);}
+#panel-2 .spark-yrs {display:flex;justify-content:space-between;margin-top:4px;}
+#panel-2 .spark-yrs span {font-size:9px;color:var(--text-3);}
+#panel-2 .kpi-section {margin-bottom:14px;}
+#panel-2 .kpi-section-lbl {font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px;padding-left:2px;}
+#panel-2 .kpi-row {display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:6px;}
+#panel-2 .kpi {background:var(--white);border:1px solid var(--line);border-top:3px solid var(--navy);border-radius:3px;padding:12px 13px;}
+#panel-2 .kpi.orange {border-top-color:var(--orange);}
+#panel-2 .kpi.teal {border-top-color:var(--teal);}
+#panel-2 .kpi.t5 {border-top-color:var(--orange);background:var(--orange-dim);}
+#panel-2 .kpi.dim {opacity:.78;}
+#panel-2 .kpi-lbl {font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.10em;color:var(--text-3);margin-bottom:4px;}
+#panel-2 .kpi-val {font-family:var(--mono);font-size:18px;font-weight:700;color:var(--navy);line-height:1;}
+#panel-2 .kpi.orange .kpi-val, #panel-2 .kpi.t5 .kpi-val {color:var(--orange);}
+#panel-2 .kpi-unit {font-size:10px;color:var(--text-3);margin-top:3px;}
+#panel-2 .chart-card {background:var(--white);border:1px solid var(--line);border-radius:3px;padding:15px 19px;margin-bottom:15px;}
+#panel-2 .chart-hdr {display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;}
+#panel-2 .chart-ttl {font-size:13px;font-weight:700;color:var(--navy);}
+#panel-2 .legend {display:flex;gap:14px;}
+#panel-2 .leg {display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);}
+#panel-2 .leg-dot {width:10px;height:10px;border-radius:2px;}
+#panel-2 .tbl-card {background:var(--white);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-bottom:16px;}
+#panel-2 .tbl-hdr-row {display:flex;justify-content:space-between;align-items:center;padding:11px 17px;background:var(--navy);border-bottom:2px solid var(--orange);}
+#panel-2 .tbl-ttl {font-size:13px;font-weight:700;color:#FFF;}
+#panel-2 .tbl-sub {font-size:10px;color:rgba(255,255,255,0.45);}
+#panel-2 .tbl-card table {width:100%;border-collapse:collapse;}
+#panel-2 .tbl-card th {font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--text-3);padding:8px 17px;text-align:right;border-bottom:1px solid var(--line);background:#FAFBFC;white-space:nowrap;}
+#panel-2 .tbl-card th:first-child {text-align:left;}
+#panel-2 .tbl-card td {padding:7px 17px;font-size:12px;font-family:var(--mono);text-align:right;color:var(--text-1);border-bottom:1px solid var(--line-light);}
+#panel-2 .tbl-card td:first-child {font-family:var(--sans);font-weight:700;font-size:12.5px;text-align:left;color:var(--navy);}
+#panel-2 .tbl-card tr:last-child td {border-bottom:none;}
+#panel-2 .tbl-card tr:nth-child(even) td {background:#FAFBFC;}
+#panel-2 .tbl-card tr:hover td {background:var(--navy-dim);}
+#panel-2 .c-navy {color:var(--navy);}
+#panel-2 .c-orange {color:var(--orange);}
+#panel-2 .c-teal {color:var(--teal);}
+#panel-2 .c-dim {color:var(--text-3);font-style:italic;}
+#panel-2 .abar {display:inline-block;height:3px;background:linear-gradient(90deg,var(--navy),var(--teal));border-radius:2px;vertical-align:middle;margin-right:5px;opacity:0.55;}
+#panel-2 .footnote {font-size:9.5px;color:var(--text-3);padding:0 0 14px;}
+#panel-2 .ctry-sel {width:100%;font-size:13px;font-weight:700;padding:8px 10px;border:1px solid var(--line);border-radius:3px;background:var(--white);color:var(--navy);cursor:pointer;font-family:var(--sans);margin-bottom:10px;}
+#panel-2 .ctry-meta {display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+#panel-2 .ctry-badge {font-size:10px;font-weight:700;padding:3px 8px;border-radius:2px;white-space:nowrap;}
+#panel-2 .ctry-badge.arch {background:var(--navy-dim);color:var(--navy);}
+#panel-2 .ctry-badge.pop {background:var(--orange-dim);color:var(--orange);}
+#panel-2 .ctry-badge.otr {background:var(--teal-dim);color:var(--teal);}
+#panel-2 .sync-bar {display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--navy-dim);border-radius:3px;margin-bottom:10px;}
+#panel-2 .sync-lbl {font-size:9.5px;font-weight:700;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-right:2px;}
+#panel-2 .sync-btn {font-size:10px;font-weight:700;padding:4px 10px;border:1px solid var(--line);border-radius:2px;background:var(--white);color:var(--text-2);cursor:pointer;transition:all .12s;}
+#panel-2 .sync-btn:hover {border-color:var(--orange);color:var(--orange);}
+#panel-2 .sync-ok {border-color:var(--teal)!important;color:var(--teal)!important;}
+#panel-2 .tier-row {display:flex;gap:4px;margin-top:6px;}
+#panel-2 .tier-row .tbtn {padding:4px 9px;font-size:10px;letter-spacing:.04em;}
+
+</style>
+
+<div class="shell">
+  <!-- ══ INPUT PANEL ══ -->
+  <div class="inp">
+
+    <!-- 00 Country -->
+    <div class="sec">
+      <div class="sec-lbl">00 — Country</div>
+      <select class="ctry-sel" id="ctrySelect" onchange="loadCountry(this.value)"></select>
+      <div class="ctry-meta">
+        <span class="ctry-badge arch" id="ctryArch">—</span>
+        <span class="ctry-badge pop"  id="ctryPop">—</span>
+        <span class="ctry-badge otr"  id="ctryOtr">—</span>
+      </div>
+      <div class="sync-bar">
+        <span class="sync-lbl">Sync</span>
+        <button class="sync-btn" id="syncT1Btn" onclick="syncFromTab1()" title="Pull default $/event for active use case from Tab 1 pricing model">← Tab 1 price</button>
+        <button class="sync-btn" id="syncT2Btn" onclick="syncFromTab2()" title="Load country clicked in Tab 2 eKYC matrix">← Tab 2 country</button>
+        <button class="sync-btn" onclick="exportCSV()" style="margin-left:auto">↓ CSV</button>
+      </div>
+    </div>
+
+    <!-- 01 Use Case -->
+    <div class="sec">
+      <div class="sec-lbl">01 — Use Case</div>
+      <div class="uc-grid" id="ucGrid"></div>
+    </div>
+
+    <!-- 02 Population Drivers -->
+    <div class="sec">
+      <div class="sec-lbl">02 — Population Drivers</div>
+      <div class="drv">
+        <div class="drv-hdr"><span class="drv-name">Total Population</span></div>
+        <div class="numinput">
+          <input type="number" id="totalPop" value="2600000" min="10000" step="100000">
+          <span class="numinput-unit">persons</span>
+        </div>
+      </div>
+      <div class="drv">
+        <div class="drv-hdr">
+          <span class="drv-name">Eligible Age Bracket</span>
+          <span class="drv-val" id="v_age">70%</span>
+        </div>
+        <input type="range" id="ageElig" min="30" max="95" step="1" value="70">
+        <div class="range-tks"><span>30%</span><span>share of pop. aged 15+</span><span>95%</span></div>
+      </div>
+      <div class="drv">
+        <div class="drv-hdr">
+          <span class="drv-name">ID / Service Coverage</span>
+          <span class="drv-val" id="v_svc">80%</span>
+        </div>
+        <input type="range" id="svcCov" min="5" max="100" step="1" value="80">
+        <div class="range-tks"><span>5%</span><span>enrolled / reachable</span><span>100%</span></div>
+      </div>
+      <div class="computed">
+        <span class="computed-l">Applicable Population</span>
+        <span class="computed-v" id="applicablePop">—</span>
+      </div>
+    </div>
+
+    <!-- 03 Event Drivers -->
+    <div class="sec">
+      <div class="sec-lbl">03 — Event Drivers</div>
+      <div class="drv">
+        <div class="drv-hdr">
+          <span class="drv-name">Event Frequency</span>
+          <span class="drv-val" id="v_freq">1.0 / yr</span>
+        </div>
+        <input type="range" id="freq" min="0.1" max="52" step="0.1" value="1.0">
+        <div class="range-tks"><span>0.1</span><span>events per enrolled user per year</span><span>52</span></div>
+      </div>
+      <div class="drv" style="margin-bottom:0">
+        <div class="drv-hdr" style="margin-bottom:4px">
+          <span class="drv-name">OT Revenue / Event</span>
+          <span style="font-size:9px;color:var(--text-3)" id="revSrc">eKYC T1 · BWA</span>
+        </div>
+        <div class="rev-row">
+          <div class="rev-input-wrap">
+            <input type="number" id="revEvt" value="1.42" min="0.001" step="0.01">
+          </div>
+          <span style="font-size:9.5px;color:var(--text-3);white-space:nowrap">USD</span>
+        </div>
+        <div class="tier-row" id="tierRow">
+          <button class="tbtn active" id="tierT1" onclick="setEkycTier('T1')">T1 eKYC</button>
+          <button class="tbtn"        id="tierT2" onclick="setEkycTier('T2')">T2 + anchor</button>
+          <button class="tbtn"        id="tierT3" onclick="setEkycTier('T3')">T3 + 2nd</button>
+        </div>
+      </div>
+      <div class="drv" style="margin-top:13px;margin-bottom:0">
+        <div class="drv-hdr"><span class="drv-name">Projection Start Year</span></div>
+        <div class="numinput" style="max-width:150px">
+          <input type="number" id="startYear" value="2026" min="2020" max="2040" step="1">
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 Adoption Ramp -->
+    <div class="sec">
+      <div class="sec-lbl">04 — Adoption Ramp</div>
+      <div class="tog-row">
+        <button class="tbtn" id="btnLin" onclick="setModel('linear')">Linear</button>
+        <button class="tbtn active" id="btnScv" onclick="setModel('scurve')">S-Curve</button>
+      </div>
+      <div class="drv">
+        <div class="drv-hdr">
+          <span class="drv-name">Year 1 Adoption Rate</span>
+          <span class="drv-val" id="v_y1">2.0%</span>
+        </div>
+        <input type="range" class="oth" id="y1Adopt" min="0.1" max="25" step="0.1" value="2">
+        <div class="range-tks"><span>0.1%</span><span>of applicable population in year 1</span><span>25%</span></div>
+      </div>
+      <div class="drv">
+        <div class="drv-hdr">
+          <span class="drv-name">Maximum Adoption Ceiling</span>
+          <span class="drv-val" id="v_max">35%</span>
+        </div>
+        <input type="range" class="oth" id="maxAdopt" min="5" max="95" step="1" value="35">
+        <div class="range-tks"><span>5%</span><span>long-run ceiling</span><span>95%</span></div>
+      </div>
+      <div class="drv">
+        <div class="drv-hdr">
+          <span class="drv-name" id="rampLbl">Inflection Year (S-Curve)</span>
+          <span class="drv-val" id="v_spd">5</span>
+        </div>
+        <input type="range" class="oth" id="rampSpd" min="2" max="9" step="1" value="5">
+        <div class="range-tks"><span>2 yrs</span><span></span><span>9 yrs</span></div>
+      </div>
+      <div class="spark">
+        <div class="spark-hdr">
+          <span>Adoption Curve Preview</span>
+          <span class="spark-ann" id="sparkAnn">—</span>
+        </div>
+        <svg id="sparkSvg" width="100%" height="48" viewBox="0 0 300 48" preserveAspectRatio="none"></svg>
+        <div class="spark-yrs"><span>Y1</span><span>Y3</span><span>Y5</span><span>Y7</span><span>Y10</span></div>
+      </div>
+    </div>
+
+  </div><!-- /inp -->
+
+  <!-- ══ OUTPUT PANEL ══ -->
+  <div class="out">
+
+    <!-- KPI — OmniTrust Revenue row -->
+    <div class="kpi-section">
+      <div class="kpi-section-lbl">OmniTrust SPV Revenue</div>
+      <div class="kpi-row">
+        <div class="kpi orange">
+          <div class="kpi-lbl">10-Year Cumulative</div>
+          <div class="kpi-val" id="kRev10">—</div>
+          <div class="kpi-unit">OT revenue · USD</div>
+        </div>
+        <div class="kpi orange dim">
+          <div class="kpi-lbl">5-Year Cumulative</div>
+          <div class="kpi-val" id="kRev5">—</div>
+          <div class="kpi-unit">OT revenue · USD</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-lbl">10-Year Volume</div>
+          <div class="kpi-val" id="kVol10">—</div>
+          <div class="kpi-unit">cumulative events</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-lbl">Volume CAGR</div>
+          <div class="kpi-val" id="kCAGR">—</div>
+          <div class="kpi-unit">Y1 → Y10</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI — TECH5-SA share row -->
+    <div class="kpi-section">
+      <div class="kpi-section-lbl">TECH5-SA 25% SPV Share</div>
+      <div class="kpi-row">
+        <div class="kpi t5">
+          <div class="kpi-lbl">10-Year Share</div>
+          <div class="kpi-val" id="kT5_10">—</div>
+          <div class="kpi-unit">TECH5-SA 25% · USD</div>
+        </div>
+        <div class="kpi t5 dim">
+          <div class="kpi-lbl">5-Year Share</div>
+          <div class="kpi-val" id="kT5_5">—</div>
+          <div class="kpi-unit">TECH5-SA 25% · USD</div>
+        </div>
+        <div class="kpi teal">
+          <div class="kpi-lbl">Year 10 Enrolled</div>
+          <div class="kpi-val" id="kEnr10">—</div>
+          <div class="kpi-unit">active users</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-lbl">Year 10 Ann. Revenue</div>
+          <div class="kpi-val" id="kRevY10">—</div>
+          <div class="kpi-unit">OT · Year 10 only</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart — stacked bar -->
+    <div class="chart-card">
+      <div class="chart-hdr">
+        <span class="chart-ttl" id="chartTtl">Revenue Build-up — 10-Year</span>
+        <div class="legend">
+          <div class="leg"><div class="leg-dot" style="background:rgba(242,101,34,.9)"></div>TECH5-SA 25%</div>
+          <div class="leg"><div class="leg-dot" style="background:rgba(27,58,106,.8)"></div>OmniTrust 75%</div>
+          <div class="leg"><div class="leg-dot" style="background:#006767;opacity:.7"></div>Event Vol</div>
+        </div>
+      </div>
+      <div style="height:250px;position:relative;">
+        <canvas id="volChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="tbl-card">
+      <div class="tbl-hdr-row">
+        <span class="tbl-ttl" id="tblTtl">Annual Projection Detail</span>
+        <span class="tbl-sub" id="tblSub"></span>
+      </div>
+      <table>
+        <thead><tr>
+          <th>Year</th>
+          <th>Applicable Pop</th>
+          <th>Adoption %</th>
+          <th>Enrolled</th>
+          <th>Event Volume</th>
+          <th>OT Revenue</th>
+          <th>TECH5-SA 25%</th>
+          <th>Cumul. TECH5-SA</th>
+        </tr></thead>
+        <tbody id="tblBody"></tbody>
+        <tfoot id="tblFoot"></tfoot>
+      </table>
+    </div>
+    <div class="footnote" id="footnote"></div>
+  </div><!-- /out -->
+</div><!-- /shell -->
+
+<script>
+
+const CTRY=[
+  {c:'BWA',n:'Botswana',         f:'🇧🇼',p:2600000,   arch:'Hummingbird',age:70,cov:80,otr:1.42},
+  {c:'COM',n:'Comoros',          f:'🇰🇲',p:850000,    arch:'Hummingbird',age:62,cov:30,otr:2.60},
+  {c:'COL',n:'Colombia',         f:'🇨🇴',p:51800000,  arch:'Workhorse',  age:72,cov:78,otr:1.05},
+  {c:'DJI',n:'Djibouti',         f:'🇩🇯',p:1100000,   arch:'Hummingbird',age:65,cov:40,otr:2.10},
+  {c:'ETH',n:'Ethiopia',         f:'🇪🇹',p:129000000, arch:'Blue Whale', age:62,cov:25,otr:1.95},
+  {c:'FJI',n:'Fiji',             f:'🇫🇯',p:930000,    arch:'Hummingbird',age:68,cov:65,otr:1.85},
+  {c:'GTM',n:'Guatemala',        f:'🇬🇹',p:17600000,  arch:'Gazelle',    age:66,cov:70,otr:1.20},
+  {c:'HND',n:'Honduras',         f:'🇭🇳',p:10200000,  arch:'Gazelle',    age:68,cov:72,otr:1.20},
+  {c:'IDN',n:'Indonesia',        f:'🇮🇩',p:276000000, arch:'Blue Whale', age:70,cov:78,otr:0.88},
+  {c:'KEN',n:'Kenya',            f:'🇰🇪',p:55000000,  arch:'Workhorse',  age:67,cov:62,otr:1.05},
+  {c:'MUS',n:'Mauritius',        f:'🇲🇺',p:1300000,   arch:'Hummingbird',age:74,cov:95,otr:1.12},
+  {c:'PER',n:'Peru',             f:'🇵🇪',p:32500000,  arch:'Workhorse',  age:72,cov:82,otr:1.05},
+  {c:'PNG',n:'Papua New Guinea', f:'🇵🇬',p:10300000,  arch:'Gazelle',    age:60,cov:35,otr:2.10},
+  {c:'SEN',n:'Senegal',          f:'🇸🇳',p:17200000,  arch:'Gazelle',    age:63,cov:60,otr:1.55},
+  {c:'SOM',n:'Somalia',          f:'🇸🇴',p:17500000,  arch:'Gazelle',    age:58,cov:18,otr:2.38},
+  {c:'TLS',n:'Timor-Leste',      f:'🇹🇱',p:1300000,   arch:'Hummingbird',age:63,cov:25,otr:2.40},
+  {c:'TZA',n:'Tanzania',         f:'🇹🇿',p:63500000,  arch:'Workhorse',  age:63,cov:45,otr:1.62},
+  {c:'UGA',n:'Uganda',           f:'🇺🇬',p:47100000,  arch:'Workhorse',  age:62,cov:55,otr:1.40},
+  {c:'ZMB',n:'Zambia',           f:'🇿🇲',p:19500000,  arch:'Gazelle',    age:63,cov:35,otr:1.88},
+];
+const ARCH_DEF={
+  'Hummingbird':{y1:2, max:35,spd:5,m:'scurve'},
+  'Gazelle':    {y1:3, max:45,spd:5,m:'scurve'},
+  'Workhorse':  {y1:5, max:55,spd:4,m:'scurve'},
+  'Blue Whale': {y1:8, max:65,spd:4,m:'scurve'},
+};
+(function(){
+const UC={
+  kyc:   {label:'KYC / Identity Verify',    icon:'🪪',desc:'Digital identity checks, onboarding',  freq:1.0, age:70,svc:80,y1:2, max:35,spd:5,m:'scurve'},
+  pay:   {label:'Digital Payments (P2P/P2M)',icon:'💳',desc:'Peer-to-peer & merchant transactions', freq:24,  age:65,svc:70,y1:3, max:45,spd:4,m:'scurve'},
+  gov:   {label:'Government Benefits',      icon:'🏛️',desc:'Social protection & cash transfers',   freq:12,  age:72,svc:60,y1:5, max:55,spd:3,m:'linear'},
+  health:{label:'Healthcare e-Records',     icon:'🏥',desc:'Patient identity & health records',    freq:4,   age:75,svc:55,y1:2, max:40,spd:5,m:'scurve'},
+  bank:  {label:'Financial Onboarding',     icon:'🏦',desc:'Bank account & credit product opening',freq:1.5, age:65,svc:65,y1:3, max:40,spd:5,m:'scurve'},
+  tax:   {label:'Tax Filing / e-Gov',       icon:'📋',desc:'Digital tax & government interactions',freq:1.0, age:60,svc:50,y1:4, max:35,spd:4,m:'linear'},
+  util:  {label:'Utility Payments',         icon:'⚡',desc:'Electricity, water, telecoms payments',freq:12,  age:65,svc:72,y1:5, max:55,spd:3,m:'scurve'},
+  esim:  {label:'e-SIM Registration',       icon:'📱',desc:'Regulatory-compliant SIM registration',freq:0.5, age:60,svc:70,y1:6, max:65,spd:3,m:'linear'},
+};
+
+let S={uc:'kyc',totalPop:2600000,age:70,svc:80,freq:1.0,rev:1.42,startYear:2026,model:'scurve',y1:2,max:35,spd:5};
+let S_baseotr=1.42, S_tier='T1', S_ctry='BWA';
+let volChart2=null, lastRows2=[];
+
+const fN=n=>{if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n.toFixed(0);};
+const fM=n=>{if(n>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return'$'+(n/1e3).toFixed(1)+'K';return'$'+n.toFixed(2);};
+const fC=n=>Math.round(n).toLocaleString();
+
+// ── Country selector ─────────────────────────────────────────────
+function buildCountrySelect(){
+  const sel=document.getElementById('ctrySelect');
+  CTRY.forEach(c=>{
+    const o=document.createElement('option');
+    o.value=c.c; o.textContent=`${c.f} ${c.n} (${c.arch})`;
+    if(c.c==='BWA') o.selected=true;
+    sel.appendChild(o);
+  });
+}
+
+function loadCountry(code){
+  const c=CTRY.find(x=>x.c===code); if(!c) return;
+  S_ctry=code; S_baseotr=c.otr;
+  document.getElementById('totalPop').value=c.p;
+  document.getElementById('ageElig').value=c.age;
+  document.getElementById('svcCov').value=c.cov;
+  // Apply archetype ramp
+  const ad=ARCH_DEF[c.arch]||{y1:2,max:35,spd:5,m:'scurve'};
+  document.getElementById('y1Adopt').value=ad.y1;
+  document.getElementById('maxAdopt').value=ad.max;
+  document.getElementById('rampSpd').value=ad.spd;
+  // Recompute tier rates with current Tab 1 anchors
+  applyTier(S_tier, c.otr, code);
+  document.getElementById('ctryArch').textContent=c.arch;
+  document.getElementById('ctryPop').textContent=(c.p/1e6).toFixed(c.p>=1e6?2:3)+'M pop';
+  document.getElementById('ctryOtr').textContent='eKYC T1 $'+c.otr.toFixed(2)+'/check';
+  setModel(ad.m);
+}
+
+function tierRates(base){
+  if(window.getEkycTierRates) return window.getEkycTierRates(base);
+  // fallback: $0.75 anchor premium per tier step at 50% markup
+  return {T1:+base.toFixed(3), T2:+(base+0.75).toFixed(3), T3:+(base+1.50).toFixed(3)};
+}
+
+function applyTier(tier, base, code){
+  const rates=tierRates(base);
+  document.getElementById('revEvt').value=rates[tier].toFixed(2);
+  document.getElementById('revSrc').textContent=`eKYC ${tier} · ${code}`;
+  ['T1','T2','T3'].forEach(t=>document.getElementById('tier'+t).classList.toggle('active',t===tier));
+  S_tier=tier;
+  update2();
+}
+
+window.setEkycTier=function(t){ applyTier(t, S_baseotr, S_ctry); };
+
+// ── Cross-tab sync ───────────────────────────────────────────────
+function syncFromTab1(){
+  const btn=document.getElementById('syncT1Btn');
+  let price;
+  if(window.getTab1Price){
+    price=window.getTab1Price(S.uc);
+  } else if(window.OT_SYNC&&window.OT_SYNC.txPrice!=null){
+    price=window.OT_SYNC.txPrice;
+  } else {
+    alert('Tab 1 price not available — visit Tab 1 first.');
+    return;
+  }
+  document.getElementById('revEvt').value=price.toFixed(3);
+  document.getElementById('revSrc').textContent=`← Tab 1 default · ${S.uc}`;
+  ['T1','T2','T3'].forEach(t=>document.getElementById('tier'+t).classList.remove('active'));
+  btn.classList.add('sync-ok');
+  setTimeout(()=>btn.classList.remove('sync-ok'),2000);
+  update2();
+}
+function syncFromTab2(){
+  const btn=document.getElementById('syncT2Btn');
+  if(window.OT_SYNC&&window.OT_SYNC.country){
+    const name=window.OT_SYNC.country;
+    const c=CTRY.find(x=>x.n===name||x.c===name);
+    if(c){
+      document.getElementById('ctrySelect').value=c.c;
+      loadCountry(c.c);
+      btn.classList.add('sync-ok');
+      setTimeout(()=>btn.classList.remove('sync-ok'),2000);
+      return;
+    }
+  }
+  alert('No country selected in Tab 2 — click a pipeline row there first.');
+}
+window.syncFromTab1=syncFromTab1;
+window.syncFromTab2=syncFromTab2;
+
+// ── Use case grid ────────────────────────────────────────────────
+function buildGrid2(){
+  const g=document.getElementById('ucGrid');
+  Object.entries(UC).forEach(([k,u])=>{
+    const d=document.createElement('div');
+    d.className='uc-card'+(k==='kyc'?' active':'');
+    d.id='ucc-'+k;
+    d.innerHTML=`<div class="uc-icon">${u.icon}</div><div class="uc-name">${u.label}</div><div class="uc-desc">${u.desc}</div>`;
+    d.onclick=()=>loadUC2(k);
+    g.appendChild(d);
+  });
+}
+function loadUC2(k){
+  const u=UC[k]; S.uc=k;
+  document.querySelectorAll('#panel-2 .uc-card').forEach(c=>c.classList.remove('active'));
+  const el=document.getElementById('ucc-'+k); if(el) el.classList.add('active');
+  document.getElementById('ageElig').value=u.age;
+  document.getElementById('svcCov').value=u.svc;
+  document.getElementById('freq').value=u.freq;
+  document.getElementById('y1Adopt').value=u.y1;
+  document.getElementById('maxAdopt').value=u.max;
+  document.getElementById('rampSpd').value=u.spd;
+  setModel(u.m);
+}
+function setV2(id,v){const e=document.getElementById(id);if(e)e.value=v;}
+
+// ── Model toggle ─────────────────────────────────────────────────
+function setModel(m){
+  S.model=m;
+  document.getElementById('btnLin').classList.toggle('active',m==='linear');
+  document.getElementById('btnScv').classList.toggle('active',m==='scurve');
+  document.getElementById('rampLbl').textContent=m==='linear'?'Years to Max Adoption':'Inflection Year (S-Curve)';
+  update2();
+}
+window.setModel=setModel;
+
+// ── Adoption rates ───────────────────────────────────────────────
+function adoptRates2(y1,maxA,spd,model){
+  const out=[];
+  if(model==='linear'){
+    const inc=(maxA-y1)/Math.max(spd-1,1);
+    for(let n=1;n<=10;n++) out.push(Math.min(y1+(n-1)*inc,maxA));
+  } else {
+    const ratio=maxA/y1-1;
+    const k=ratio>0.001?Math.log(ratio)/Math.max(spd-1,0.5):0.5;
+    for(let n=1;n<=10;n++) out.push(Math.min(Math.max(maxA/(1+Math.exp(-k*(n-spd))),0.01),maxA));
+  }
+  return out;
+}
+
+// ── Sparkline ────────────────────────────────────────────────────
+function drawSpark2(rates){
+  const svg=document.getElementById('sparkSvg');
+  const W=300,H=48,PX=5,PY=5,maxR=Math.max(...rates)||1;
+  const pts=rates.map((r,i)=>[PX+(i/9)*(W-2*PX),PY+(1-r/maxR)*(H-2*PY)]);
+  const line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join('');
+  const area=line+` L${pts[9][0].toFixed(1)} ${H} L${pts[0][0].toFixed(1)} ${H} Z`;
+  svg.innerHTML=`<defs><linearGradient id="sg3" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#1B3A6A" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="#1B3A6A" stop-opacity="0"/></linearGradient></defs>
+    <path d="${area}" fill="url(#sg3)"/>
+    <path d="${line}" fill="none" stroke="#F26522" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    ${pts.map((p,i)=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${i===0||i===9?2.5:1.5}" fill="${i===9?'#1B3A6A':'#F26522'}" opacity="${i===0||i===9?1:0.45}"/>`).join('')}`;
+  document.getElementById('sparkAnn').textContent=`Y1: ${rates[0].toFixed(1)}%  →  Y10: ${rates[9].toFixed(1)}%`;
+}
+
+// ── Stacked bar + line chart ─────────────────────────────────────
+function drawChart2(years,t5revs,otrevs,volumes){
+  const ctx=document.getElementById('volChart').getContext('2d');
+  if(volChart2){volChart2.destroy();volChart2=null;}
+  volChart2=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:years.map(String),
+      datasets:[
+        {
+          label:'TECH5-SA 25%',
+          data:t5revs,
+          backgroundColor:'rgba(242,101,34,0.88)',
+          borderColor:'rgba(242,101,34,0)',
+          stack:'rev', yAxisID:'yR', order:2,
+          borderRadius:{topLeft:0,topRight:0,bottomLeft:3,bottomRight:3},
+          borderSkipped:false,
+        },
+        {
+          label:'OmniTrust 75%',
+          data:otrevs,
+          backgroundColor:'rgba(27,58,106,0.78)',
+          borderColor:'rgba(27,58,106,0)',
+          stack:'rev', yAxisID:'yR', order:2,
+          borderRadius:{topLeft:3,topRight:3,bottomLeft:0,bottomRight:0},
+          borderSkipped:false,
+        },
+        {
+          label:'Event Volume',
+          data:volumes,
+          type:'line',
+          borderColor:'rgba(0,103,103,0.65)',
+          backgroundColor:'rgba(0,103,103,0.05)',
+          borderWidth:2,
+          pointBackgroundColor:'#006767',
+          pointRadius:3, tension:0.35, fill:true,
+          yAxisID:'yV', order:1,
+        }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#FFF',borderColor:'rgba(27,58,106,0.15)',borderWidth:1,
+          titleColor:'#596070',bodyColor:'#2C3242',padding:11,
+          callbacks:{label:(c)=>{
+            if(c.dataset.label==='TECH5-SA 25%') return '  TECH5-SA 25%: '+fM(c.parsed.y);
+            if(c.dataset.label==='OmniTrust 75%') return '  OmniTrust 75%: '+fM(c.parsed.y);
+            return '  Event Volume: '+fC(c.parsed.y);
+          }}
+        }
+      },
+      scales:{
+        x:{grid:{color:'rgba(27,58,106,0.05)'},ticks:{color:'#9AAABB',font:{size:11,family:'Consolas,monospace'}},border:{display:false}},
+        yR:{position:'left',stacked:true,grid:{color:'rgba(27,58,106,0.07)'},
+            ticks:{color:'#1B3A6A',font:{size:10,family:'Consolas,monospace'},callback:v=>fM(v)},
+            border:{display:false},title:{display:true,text:'OT Revenue (USD)',color:'#1B3A6A',font:{size:10}}},
+        yV:{position:'right',grid:{drawOnChartArea:false},
+            ticks:{color:'#006767',font:{size:10,family:'Consolas,monospace'},callback:v=>fN(v)},
+            border:{display:false},title:{display:true,text:'Events',color:'#006767',font:{size:10}}}
+      }
+    }
+  });
+}
+
+// ── Table ────────────────────────────────────────────────────────
+function drawTable2(rows,appPop){
+  const tb=document.getElementById('tblBody'); tb.innerHTML='';
+  let cumT5=0;
+  rows.forEach(r=>{
+    cumT5+=r.revenue*0.25;
+    const bw=Math.round((r.adopt/S.max)*48);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${r.year}</td>
+      <td class="c-dim">${fC(appPop)}</td>
+      <td><span class="abar" style="width:${bw}px"></span>${r.adopt.toFixed(1)}%</td>
+      <td class="c-navy">${fC(r.enrolled)}</td>
+      <td class="c-teal">${fC(r.volume)}</td>
+      <td class="c-orange" style="font-weight:700">${fM(r.revenue)}</td>
+      <td style="color:#C9521A;font-weight:700">${fM(r.revenue*0.25)}</td>
+      <td style="color:#C9521A">${fM(cumT5)}</td>`;
+    tb.appendChild(tr);
+  });
+  const totR=rows.reduce((s,r)=>s+r.revenue,0);
+  const totV=rows.reduce((s,r)=>s+r.volume,0);
+  document.getElementById('tblFoot').innerHTML=`
+    <tr style="background:#F0F2F4;border-top:1px solid #DDE2E8;">
+      <td colspan="4" style="font-family:var(--sans);font-weight:700;color:#1B3A6A;">10-Year Total</td>
+      <td class="c-teal" style="font-weight:800">${fC(totV)}</td>
+      <td class="c-orange" style="font-weight:800">${fM(totR)}</td>
+      <td style="color:#C9521A;font-weight:800">${fM(totR*0.25)}</td>
+      <td style="color:#C9521A;font-weight:800">${fM(totR*0.25)}</td>
+    </tr>`;
+  document.getElementById('tblSub').textContent=`Freq: ${S.freq.toFixed(1)}×/yr · OT Rev/event: $${S.rev.toFixed(2)} (${S_tier})`;
+}
+
+// ── Main update ──────────────────────────────────────────────────
+function update2(){
+  S.totalPop  = parseInt(document.getElementById('totalPop').value)||2600000;
+  S.age       = parseFloat(document.getElementById('ageElig').value);
+  S.svc       = parseFloat(document.getElementById('svcCov').value);
+  S.freq      = parseFloat(document.getElementById('freq').value);
+  S.rev       = parseFloat(document.getElementById('revEvt').value)||1.42;
+  S.startYear = parseInt(document.getElementById('startYear').value)||2026;
+  S.y1        = parseFloat(document.getElementById('y1Adopt').value);
+  S.max       = parseFloat(document.getElementById('maxAdopt').value);
+  S.spd       = parseInt(document.getElementById('rampSpd').value);
+  if(S.y1>S.max){S.y1=S.max;document.getElementById('y1Adopt').value=S.max;}
+
+  document.getElementById('v_age').textContent  = S.age+'%';
+  document.getElementById('v_svc').textContent  = S.svc+'%';
+  document.getElementById('v_freq').textContent = (+S.freq).toFixed(1)+' / yr';
+  document.getElementById('v_y1').textContent   = S.y1.toFixed(1)+'%';
+  document.getElementById('v_max').textContent  = S.max+'%';
+  document.getElementById('v_spd').textContent  = S.spd;
+
+  const appPop=S.totalPop*(S.age/100)*(S.svc/100);
+  document.getElementById('applicablePop').textContent=fC(Math.round(appPop));
+  const rates=adoptRates2(S.y1,S.max,S.spd,S.model);
+  drawSpark2(rates);
+
+  const rows=[],years=[],t5=[],ot75=[],vols=[];
+  for(let i=0;i<10;i++){
+    const yr=S.startYear+i, a=rates[i];
+    const e=appPop*(a/100), v=e*S.freq, r=v*S.rev;
+    rows.push({year:yr,adopt:a,enrolled:Math.round(e),volume:Math.round(v),revenue:r});
+    years.push(yr); t5.push(r*0.25); ot75.push(r*0.75); vols.push(Math.round(v));
+  }
+  lastRows2=rows;
+
+  const rev10=rows.reduce((s,r)=>s+r.revenue,0);
+  const rev5 =rows.slice(0,5).reduce((s,r)=>s+r.revenue,0);
+  const vol10=vols.reduce((a,b)=>a+b,0);
+  const cagr =vols[0]>0?(Math.pow(vols[9]/vols[0],1/9)-1)*100:0;
+
+  document.getElementById('kRev10').textContent  = fM(rev10);
+  document.getElementById('kRev5').textContent   = fM(rev5);
+  document.getElementById('kVol10').textContent  = fN(vol10);
+  document.getElementById('kCAGR').textContent   = cagr.toFixed(1)+'%';
+  document.getElementById('kT5_10').textContent  = fM(rev10*0.25);
+  document.getElementById('kT5_5').textContent   = fM(rev5*0.25);
+  document.getElementById('kEnr10').textContent  = fN(rows[9].enrolled);
+  document.getElementById('kRevY10').textContent = fM(rows[9].revenue);
+
+  const u=UC[S.uc];
+  document.getElementById('chartTtl').textContent=u.icon+' '+u.label+' — Revenue Build-up';
+  document.getElementById('tblTtl').textContent  =u.icon+' '+u.label+' — Annual Detail';
+  drawChart2(years,t5,ot75,vols);
+  drawTable2(rows,Math.round(appPop));
+
+  document.getElementById('footnote').textContent=
+    `Applicable Pop = ${fC(S.totalPop)} × ${S.age}% age bracket × ${S.svc}% ID coverage = ${fC(Math.round(appPop))}  ·  `+
+    `Ramp: ${S.model==='linear'?'Linear':'S-Curve'}  ·  Volume = enrolled × ${S.freq.toFixed(1)} events/yr  ·  `+
+    `OT Revenue = volume × $${S.rev.toFixed(2)}/event (${S_tier})  ·  TECH5-SA = 25% SPV share`;
+
+  if(window.OT_SYNC){OT_SYNC.tab3Rev10=rev10;OT_SYNC.tab3Rev5=rev5;}
+}
+
+// ── CSV export ───────────────────────────────────────────────────
+function exportCSV(){
+  const u=UC[S.uc], ap=S.totalPop*(S.age/100)*(S.svc/100);
+  let csv=`OmniTrust Volume & Revenue — TECH5-SA\nCountry,${S_ctry}\nUse Case,${u.label}\neKYC Tier,${S_tier}\n`;
+  csv+=`OT Rev/Event,$${S.rev}\nTotal Population,${S.totalPop}\nApplicable Pop,${Math.round(ap)}\n\n`;
+  csv+='Year,Applicable Pop,Adoption %,Enrolled,Event Volume,OT Revenue,TECH5-SA 25%,Cumul TECH5-SA\n';
+  let ct5=0;
+  lastRows2.forEach(r=>{
+    ct5+=r.revenue*0.25;
+    csv+=`${r.year},${Math.round(ap)},${r.adopt.toFixed(2)},${r.enrolled},${r.volume},${r.revenue.toFixed(2)},${(r.revenue*0.25).toFixed(2)},${ct5.toFixed(2)}\n`;
+  });
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=`OmniTrust_Vol_${S_ctry}_${S.uc}.csv`; a.click();
+}
+window.exportCSV=exportCSV;
+
+// ── Listeners ────────────────────────────────────────────────────
+['totalPop','ageElig','svcCov','freq','revEvt','startYear','y1Adopt','maxAdopt','rampSpd']
+  .forEach(id=>{const e=document.getElementById(id);if(e){e.addEventListener('input',update2);e.addEventListener('change',update2);}});
+
+// ── Boot ─────────────────────────────────────────────────────────
+buildCountrySelect();
+buildGrid2();
+loadCountry('BWA');
+})();
+
+</script>
+</div><!-- /panel-2 -->
+
+</body>
+</html>
